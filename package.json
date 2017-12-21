@@ -15,10 +15,7 @@
     "client",
     "SDK"
   ],
-  "author": {
-    "name": "Jeongkyu Shin",
-    "email": "inureyes@gmail.com"
-  },
+  "author": "Jeongkyu Shin <inureyes@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/lablup/backend.ai-client-sdk-node/issues"
