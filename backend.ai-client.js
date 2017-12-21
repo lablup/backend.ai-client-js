@@ -164,5 +164,5 @@ class BackendAIClient {
   }
 }
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports.BackendAIClient = new BackendAIClient;
+  module.exports.BackendAIClient = BackendAIClient;
 }
