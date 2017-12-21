@@ -14,7 +14,7 @@ if (typeof fetch === 'undefined') {
 }
 var crypto = require('crypto');
 
-export default class BackendAIClient {
+class BackendAIClient {
   constructor() {
     this.code = null;
     this._accessKey = null;
