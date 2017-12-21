@@ -2,7 +2,7 @@
   "name": "backend.ai-client-sdk",
   "version": "0.1.0",
   "description": "Backend.AI Client SDK for node.js / javascript",
-  "main": "index.js",
+  "main": "backend-ai-client-sdk.js",
   "scripts": {
     "test": ""
   },
@@ -20,5 +20,11 @@
   "bugs": {
     "url": "https://github.com/lablup/backend.ai-client-sdk-node/issues"
   },
-  "homepage": "https://github.com/lablup/backend.ai-client-sdk-node#readme"
+  "homepage": "https://github.com/lablup/backend.ai-client-sdk-node#readme",
+  "dependencies": {
+    "node-fetch": "^1.6.3"
+  },
+  "devDependencies": {
+      "node-fetch": "^1.6.3"
+  }
 }
