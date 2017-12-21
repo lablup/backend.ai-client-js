@@ -1,6 +1,6 @@
 {
   "name": "backend.ai-client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Backend.AI Client for javascript",
   "main": "backend.ai-client.js",
   "scripts": {
@@ -29,6 +29,6 @@
     "node-fetch": "^1.6.3"
   },
   "devDependencies": {
-      "node-fetch": "^1.6.3"
+    "node-fetch": "^1.6.3"
   }
 }
