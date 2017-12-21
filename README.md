@@ -12,7 +12,7 @@ TypeScript:
 ```typescript
 import * as ai from 'backend.ai-client';
 
-let config = new ai.backend.ClientConfig.createFromEnv();
+let config = ai.backend.ClientConfig.createFromEnv();
 let client = new ai.backend.Client(config);
 ```
 
@@ -20,7 +20,7 @@ CommonJS-style:
 ```javascript
 const ai = require('backend.ai-client');
 
-let config = new ai.backend.ClientConfig.createFromEnv();
+let config = ai.backend.ClientConfig.createFromEnv();
 let client = new ai.backend.Client(config);
 ```
 
