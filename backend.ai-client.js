@@ -80,7 +80,7 @@ class BackendAIClient {
   }
 
   getAPIversion() {
-    let rqst = this.newUnsignedRequest('GET', '/');
+    let rqst = this.newUnsignedRequest('GET', '/', null);
     return fetch(rqst.uri, rqst)
     .then( function(response) {
       if (response.version) {
@@ -91,10 +91,12 @@ class BackendAIClient {
     });
   }
 
-  createKernel(kernelType) {
+  createKernel(kernelType, clientSessionToken) {
+    if (typeof clientSessionToken == 'undefined')
+      clientSessionToken = "backend-ai-live-code-runner";
     let requestBody = {
       "lang": kernelType,
-      "clientSessionToken": "backend-ai-live-code-runner",
+      "clientSessionToken": clientSessionToken,
       "resourceLimits": {
         "maxMem": 0,
         "timeout": 0
