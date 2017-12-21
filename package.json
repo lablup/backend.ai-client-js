@@ -1,0 +1,27 @@
+{
+  "name": "backend.ai-client-sdk",
+  "version": "0.1.0",
+  "description": "Backend.AI Client SDK for node.js / javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lablup/backend.ai-client-sdk-node.git"
+  },
+  "keywords": [
+    "Backend.AI",
+    "client",
+    "SDK"
+  ],
+  "author": {
+    "name": "Jeongkyu Shin",
+    "email": "inureyes@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lablup/backend.ai-client-sdk-node/issues"
+  },
+  "homepage": "https://github.com/lablup/backend.ai-client-sdk-node#readme"
+}
