@@ -14,65 +14,81 @@ if (typeof fetch === 'undefined') {
 }
 var crypto = require('crypto');
 
-class BackendAIClient {
-  constructor() {
-    this.code = null;
-    this._accessKey = null;
-    this._secretKey = null;
-    this.signKey = null;
-    this.apiVersionMajor = 'v2';
-    this.apiVersion = 'v2.20170315';
-    this.hash_type = 'sha256';
-    this.baseURL = 'https://api.backend.ai';
-    this.endpoint = 'api.backend.ai';
-    this.kernelId = null;
-    this.kernelType = null;
+class BackendAIConfig {
+  constructor(accessKey, secretKey, endpoint) {
+    // fixed configs with this implementation
+    this._apiVersionMajor = 'v2';
+    this._apiVersion = 'v2.20170315';
+    this._hashType = 'sha256';
+    // dynamic configs
+    if (typeof accessKey == 'undefined' || accessKey == null)
+      throw 'You must set accessKey.';
+    if (typeof secretKey == 'undefined' || secretKey == null)
+      throw 'You must set accessKey.';
+    if (typeof endpoint == 'undefined' || endpoint == null)
+      endpoint = 'https://api.backend.ai';
+    this._endpoint = endpoint;
+    this._accessKey = accessKey;
+    this._secretKey = secretKey;
   }
 
   get accessKey() {
-    if (this._accessKey === null) {
-      console.debug('No access key is given');
-    }
     return this._accessKey;
   }
 
   get secretKey() {
-    if (this._secretKey === null) {
-      console.debug('No secret key is given');
-    }
     return this._secretKey;
   }
 
-  set accessKey(key) {
-    this._accessKey = key;
+  get endpoint() {
+    return this._endpoint;
   }
 
-  set secretKey(key) {
-    this._secretKey = key;
+  get apiVersion() {
+    return this._apiVersion;
+  }
+
+  get apiVersionMajor {
+    return this._apiVersionMajor;
+  }
+
+  get hashType {
+    return this._hashType;
+  }
+
+  static createFromEnv() {
+    return BackendAIConfig(
+      process.env.BACKEND_ACCESS_KEY,
+      process.env.BACKEND_SECRET_KEY,
+      process.env.BACKEND_ENDPOINT
+    );
+  }
+}
+
+class BackendAIClient {
+  constructor(config) {
+    this.code = null;
+    this.signKey = null;
+    this.kernelId = null;
+    this.kernelType = null;
+    this.clientVersion = '0.1.5';  // TODO: read from package.json?
+    if (typeof config == 'undefined') {
+      this._config = BackendAIConfig.createFromEnv();
+    } else {
+      this._config = config;
+    }
   }
 
   getAPIversion() {
-    let d = new Date();
-    let requestHeaders = new Headers({
-      "Content-Type": "application/json",
-      "X-Sorna-Date": d.toISOString()
+    let rqst = this.newUnsignedRequest('GET', '/');
+    return fetch(rqst.uri, rqst)
+    .then( function(response) {
+      if (response.version) {
+        console.log(`API version: ${response.version}`);
+        return response.version;
+      }
+      return true;
     });
-
-    let requestInfo = {
-      method: 'GET',
-      headers: requestHeaders,
-      mode: 'cors',
-      cache: 'default'
-    };
-
-    return fetch(this.baseURL+'/'+this.apiVersionMajor, requestInfo)
-      .then( function(response) {
-        if (response.version) {
-          console.log(`API version: ${response.version}`);
-          return response.version;
-        }
-        return true;
-      });
   }
 
   createKernel(kernelType) {
@@ -84,21 +100,41 @@ class BackendAIClient {
         "timeout": 0
       }
     };
-    let requestInfo = this.newRequest('POST', '/v2/kernel/create', requestBody);
-    return fetch(this.baseURL + '/' + this.apiVersionMajor + '/kernel/create', requestInfo);
+    let rqst = this.newSignedRequest('POST', '/kernel/create', requestBody);
+    return fetch(rqst.uri, rqst);
   }
 
   destroyKernel(kernelId) {
-    let requestInfo = this.newRequest('DELETE', `/v2/kernel/${kernelId}`, null);
-    return fetch(this.baseURL + '/' + this.apiVersionMajor + '/kernel/'+kernelId, requestInfo);
+    let rqst = this.newSignedRequest('DELETE', `/kernel/${kernelId}`, null);
+    return fetch(rqst.uri, rqst);
   }
 
-  refreshKernel(kernelId) {
-    let requestInfo = this.newRequest('PATCH', `/${this.apiVersionMajor}/kernel/${kernelId}`, null);
-    return fetch(this.baseURL + '/' + this.apiVersionMajor + '/kernel/'+kernelId, requestInfo);
+  restartKernel(kernelId) {
+    let rqst = this.newSignedRequest('PATCH', `/kernel/${kernelId}`, null);
+    return fetch(rqst.uri, rqst);
   }
 
-  newRequest(method, queryString, body) {
+  // TODO: interrupt
+
+  // TODO: auto-complete
+
+  execute(kernelId, runId, mode, code, opts) {
+    let requestBody = {
+      "mode": mode,
+      "code": code,
+      "runId": runId,
+      "opts": opts,
+    };
+    let rqst = this.newSignedRequest('POST', `/kernel/${kernelId}`, requestBody);
+    return fetch(rqst.uri, rqst);
+  }
+
+  runCode(code, kernelId, runId, mode) {
+    // legacy alias
+    return this.execute(kernelId, runId, mode, code, {});
+  }
+
+  newSignedRequest(method, queryString, body) {
     let requestBody;
     let d = new Date();
     this.signKey = this.getSignKey(this.secretKey, d);
@@ -107,39 +143,54 @@ class BackendAIClient {
     } else {
       requestBody = JSON.stringify(body);
     }
-
+    queryString = '/' + this._config.apiVersionMajor + queryString;
     let aStr = this.getAuthenticationString(method, queryString, d.toISOString(), requestBody);
     let sig = this.sign(this.signKey, 'binary', aStr, 'hex');
 
-    let requestHeaders = new Headers({
+    let hdrs = new Headers({
       "Content-Type": "application/json; charset=utf-8",
       "Content-Length": Buffer.byteLength(requestBody),
-      'X-Sorna-Version': this.apiVersion,
-      "X-Sorna-Date": d.toISOString(),
+      "User-Agent": "Backend.AI Client for Javascript " + this.clientVersion,
+      'X-BackendAI-Version': this._config.apiVersion,
+      "X-BackendAI-Date": d.toISOString(),
       "Authorization": `Sorna signMethod=HMAC-SHA256, credential=${this.accessKey}:${sig}`
-      });
+    });
 
     let requestInfo = {
-      method,
-      headers: requestHeaders,
+      method: method,
+      headers: hdrs,
       cache: 'default',
-      body: requestBody
+      body: requestBody,
+      uri: this._config.endpoint + queryString,
     };
     return requestInfo;
   }
 
-  runCode(code, kernelId, runId, mode) {
-    let requestBody = {
-      "mode": mode,
-      "code": code,
-      "runId": runId
+  newUnsignedRequest(method, queryString, body) {
+    let d = new Date();
+    let hdrs = new Headers({
+      "Content-Type": "application/json",
+      "User-Agent": "Backend.AI Client for Javascript " + this.clientVersion,
+      'X-BackendAI-Version': this._config.apiVersion,
+      "X-BackendAI-Date": d.toISOString()
+    });
+    queryString = '/' + this._config.apiVersionMajor + queryString;
+    let requestInfo = {
+      method: method,
+      headers: hdrs,
+      mode: 'cors',
+      cache: 'default',
+      uri: this._config.endpoint + queryString,
     };
-    let requestInfo = this.newRequest('POST', `/v2/kernel/${kernelId}`, requestBody);
-    return fetch(this.baseURL + '/' + this.apiVersionMajor + '/kernel/' + kernelId, requestInfo);
+    return requestInfo;
   }
 
   getAuthenticationString(method, queryString, dateValue, bodyValue) {
-    return ( method + '\n' + queryString + '\n' + dateValue + '\n' + 'host:' + this.endpoint +  '\n'+'content-type:application/json' + '\n' + 'x-sorna-version:'+this.apiVersion + '\n' + crypto.createHash(this.hash_type).update(bodyValue).digest('hex'));
+    return (method + '\n' + queryString + '\n' + dateValue + '\n'
+            + 'host:' + this._config.endpoint + '\n'
+            + 'content-type:application/json' + '\n'
+            + 'x-backendai-version:'+this._config.apiVersion + '\n'
+            + crypto.createHash(this._config.hashType).update(bodyValue).digest('hex'));
   }
 
   getCurrentDate(now) {
@@ -163,6 +214,8 @@ class BackendAIClient {
     return k2;
   }
 }
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports.BackendAIClient = BackendAIClient;
+  module.exports.BackendAIConfig = BackendAIConfig;
 }
