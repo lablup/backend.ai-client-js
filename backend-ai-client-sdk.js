@@ -7,7 +7,11 @@ Backend.AI Cloud Javascript API Library (v2.9)
 Licensed under MIT
 */
 /*jshint esnext: true */
-import fetch, {Headers} from 'node-fetch';
+
+if (typeof fetch === 'undefined') {
+  var fetch = require('node-fetch');
+  var Headers = fetch.Headers;
+}
 var crypto = require('crypto');
 
 export default class BackendAISDK {
