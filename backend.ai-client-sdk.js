@@ -14,7 +14,7 @@ if (typeof fetch === 'undefined') {
 }
 var crypto = require('crypto');
 
-export default class BackendAISDK {
+export default class BackendAIClient {
   constructor() {
     this.code = null;
     this._accessKey = null;
@@ -164,5 +164,5 @@ export default class BackendAISDK {
   }
 }
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports.BackendAISDK = BackendAISDK;
+  module.exports.BackendAIClient = BackendAIClient;
 }

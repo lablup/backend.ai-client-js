@@ -11,9 +11,13 @@
     "url": "git+https://github.com/lablup/backend.ai-client-js.git"
   },
   "keywords": [
-    "Backend.AI",
+    "backend.ai",
     "client",
-    "SDK"
+    "machine learning",
+    "deep learning",
+    "code execution service",
+    "docker",
+    "AI"
   ],
   "author": "Jeongkyu Shin <inureyes@gmail.com>",
   "license": "MIT",
