@@ -22,9 +22,9 @@ class ClientConfig {
     this._hashType = 'sha256';
     // dynamic configs
     if (accessKey === undefined || accessKey === null)
-      throw 'You must set accessKey.';
+      throw 'You must set accessKey! (either as argument or environment variable)';
     if (secretKey === undefined || secretKey === null)
-      throw 'You must set secretKey.';
+      throw 'You must set secretKey! (either as argument or environment variable)';
     if (endpoint === undefined || endpoint === null)
       endpoint = 'https://api.backend.ai';
     this._endpoint = endpoint;
@@ -62,7 +62,7 @@ class ClientConfig {
   }
 
   static createFromEnv() {
-    return BackendAIConfig(
+    return new this(
       process.env.BACKEND_ACCESS_KEY,
       process.env.BACKEND_SECRET_KEY,
       process.env.BACKEND_ENDPOINT
@@ -84,7 +84,7 @@ class Client {
     this.clientVersion = '0.2.0';  // TODO: read from package.json?
     this.agentSignature = agentSignature;
     if (config === undefined) {
-      this._config = BackendAIConfig.createFromEnv();
+      this._config = ClientConfig.createFromEnv();
     } else {
       this._config = config;
     }
@@ -99,6 +99,27 @@ class Client {
       }
       return true;
     });
+  }
+
+  _wrapWithPromise(rqst) {
+    let promise = new Promise((resolve, reject) => {
+      fetch(rqst.uri, rqst).then(resp => {
+        resp.json().then(json => {
+          if (resp.ok) {
+            resolve(json);
+          } else {
+            reject(Client.ERR_SERVER,
+                   'server responded failure: '
+                   + `${resp.status} ${response.statusText} - ${json.title}`);
+          }
+        }).catch(err => {
+          reject(Client.ERR_RESPONSE, `reading response has failed: ${err}`);
+        });
+      }).catch(err => {
+        reject(Client.ERR_REQUEST, `sending request has failed: ${err}`);
+      });
+    });
+    return promise;
   }
 
   /**
@@ -116,7 +137,7 @@ class Client {
       "clientSessionToken": sessionId,
     };
     let rqst = this.newSignedRequest('POST', '/kernel/create', params);
-    return fetch(rqst.uri, rqst);
+    return this._wrapWithPromise(rqst);
   }
 
   /**
@@ -126,7 +147,7 @@ class Client {
    */
   destroy(sessionId) {
     let rqst = this.newSignedRequest('DELETE', `/kernel/${sessionId}`, null);
-    return fetch(rqst.uri, rqst);
+    return this._wrapWithPromise(rqst);
   }
 
   /**
@@ -136,22 +157,7 @@ class Client {
    */
   restart(sessionId) {
     let rqst = this.newSignedRequest('PATCH', `/kernel/${sessionId}`, null);
-    return fetch(rqst.uri, rqst);
-  }
-
-  createKernel(kernelType) {
-    // legacy alias
-    return this.createIfNotExists(kernelType);
-  }
-
-  destroyKernel(kernelId) {
-    // legacy alias
-    return this.destroy(kernelId);
-  }
-
-  refreshKernel(kernelId) {
-    // legacy alias
-    return this.restartKernel(kernelId);
+    return this._wrapWithPromise(rqst);
   }
 
   // TODO: interrupt
@@ -174,11 +180,23 @@ class Client {
       "opts": opts,
     };
     let rqst = this.newSignedRequest('POST', `/kernel/${sessionId}`, params);
-    return fetch(rqst.uri, rqst);
+    return this._wrapWithPromise(rqst);
+  }
+
+  // legacy aliases
+  createKernel(kernelType) {
+    return this.createIfNotExists(kernelType);
+  }
+
+  destroyKernel(kernelId) {
+    return this.destroy(kernelId);
+  }
+
+  refreshKernel(kernelId) {
+    return this.restart(kernelId);
   }
 
   runCode(code, kernelId, runId, mode) {
-    // legacy alias
     return this.execute(kernelId, runId, mode, code, {});
   }
 
@@ -281,6 +299,26 @@ class Client {
     return k2;
   }
 }
+
+// below will become "static const" properties in ES7
+Object.defineProperty(Client, 'ERR_SERVER', {
+    value: 0,
+    writable: false,
+    enumerable: true,
+    configurable: false
+});
+Object.defineProperty(Client, 'ERR_RESPONSE', {
+    value: 1,
+    writable: false,
+    enumerable: true,
+    configurable: false
+});
+Object.defineProperty(Client, 'ERR_REQUEST', {
+    value: 2,
+    writable: false,
+    enumerable: true,
+    configurable: false
+});
 
 const backend = {
   Client: Client,
