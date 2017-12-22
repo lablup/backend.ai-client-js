@@ -77,7 +77,7 @@ class Client {
   /**
    * The client API wrapper.
    *
-   * @param {BackendAIConfig} config - the API client-side configuration
+   * @param {ClientConfig} config - the API client-side configuration
    * @param {string} agentSignature - an extra string that will be appended to User-Agent headers when making API requests
    */
   constructor(config, agentSignature) {
