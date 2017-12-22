@@ -1,4 +1,4 @@
-# Backend.AI Client for Javascript
+# Backend.AI Client for Javascript (ES6+)
 
 ## Install
 
