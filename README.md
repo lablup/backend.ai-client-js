@@ -26,6 +26,10 @@ let client = new ai.backend.Client(config);
 
 When creating `ClientConfig` object, you can manually pass `accessKey`,
 `secretKey`, and optional `endpoint` arguments.
+The environment variables are:
+* `BACKEND_ACCESS_KEY`
+* `BACKEND_SECRET_KEY`
+* `BACKEND_ENDPOINT` (optional, defaults to `https://api.backend.ai`)
 
 All API functions return a promise that resolves into a JSON object
 when success and rejects with a pair of error type and error message
