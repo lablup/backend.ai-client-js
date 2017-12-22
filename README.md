@@ -1,5 +1,10 @@
 # Backend.AI Client for Javascript (ES6+)
 
+## Requirements
+
+This client SDK runs on ES6-compatible Javascript runtimes with async/await supports
+such as NodeJS 7+ and modern web browsers released since 2017.
+
 ## Install
 
 ```console
@@ -31,28 +36,34 @@ The environment variables are:
 * `BACKEND_SECRET_KEY`
 * `BACKEND_ENDPOINT` (optional, defaults to `https://api.backend.ai`)
 
-All API functions return a promise that resolves into a JSON object
-when success and rejects with a pair of error type and error message
-if failed.
+All API functions return a promise that resolves into a parsed object
+when success according to server-provided `Content-Type` and rejects with an
+object with `type` and `message` attributes if failed.
 
 ```javascript
-client.create('python:latest', 'my-session-id')
+client.createIfNotExists('python:latest', 'my-session-id')
 .then(response => {
-    console.log(`my session is created: ${response.kernelId}`);
-}).catch((errorType, errorMsg) => {
-    console.log(`session creation failed: ${errorMsg}`);
+  console.log(`my session is created: ${response.kernelId}`);
+}).catch(err => {
+  switch (err.type) {
+  case ai.backend.Client.ERR_SERVER:
+    console.log(`session creation failed: ${err.message}`);
+    break;
+  default:
+    console.log(`request/response failed: ${err.message}`);
+  }
 });
 ```
 
-JSON objects returned with success contain different fields API by API.
+The result objects returned with success has different formats API by API.
 Please check out [our official documentation](http://docs.backend.ai).
 
-`errorType` is one of the following values:
+`err.type` is one of the following values:
 
 * `ai.backend.Client.ERR_SERVER`: The server responded with failure.
-  In this case, `errorMsg` includes HTTP status and additional error information
+  In this case, `err.message` includes HTTP status and additional error information
   returned by the API server.
 * `ai.backend.Client.ERR_RESPONSE`: An error occurred while reading the response.
-  `errorMsg` includes an exception value passed from your Javascript runtime.
+  `err.message` includes an exception value passed from your Javascript runtime.
 * `ai.backend.Client.ERR_REQUEST`: An error occurred while sending the request.
-  `errorMsg` includes an exception value passed from your Javascript runtime.
+  `err.message` includes an exception value passed from your Javascript runtime.

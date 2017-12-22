@@ -61,6 +61,9 @@ class ClientConfig {
     return this._hashType;
   }
 
+  /**
+   * Create a ClientConfig object from environment variables.
+   */
   static createFromEnv() {
     return new this(
       process.env.BACKEND_ACCESS_KEY,
@@ -90,36 +93,56 @@ class Client {
     }
   }
 
-  getAPIversion() {
-    let rqst = this.newUnsignedRequest('GET', '/', null);
-    return fetch(rqst.uri, rqst)
-    .then( response => {
-      if (response.version) {
-        return response.version;
+  async _wrapWithPromise(rqst) {
+    let errorType = Client.ERR_REQUEST;
+    let errorMsg;
+    let resp, body;
+    try {
+      resp = await fetch(rqst.uri, rqst);
+      errorType = Client.ERR_RESPONSE;
+      let contentType = resp.headers.get('Content-Type');
+      if (contentType.startsWith('application/json') ||
+          contentType.startsWith('application/problem+json')) {
+        body = await resp.json();
+      } else if (contentType.startsWith('text/')) {
+        body = await resp.text();
+      } else {
+        if (resp.blob === undefined)
+          body = await resp.buffer();  // for node-fetch
+        else
+          body = await resp.blob();
       }
-      return true;
-    });
+      errorType = Client.ERR_SERVER;
+      if (!resp.ok) {
+        throw body;
+      }
+    } catch (err) {
+      switch (errorType) {
+      case Client.ERR_REQUEST:
+        errorMsg = `sending request has failed: ${err}`;
+        break;
+      case Client.ERR_RESPONSE:
+        errorMsg = `reading response has failed: ${err}`;
+        break;
+      case Client.ERR_SERVER:
+        errorMsg = 'server responded failure: '
+                   + `${resp.status} ${resp.statusText} - ${body.title}`;
+        break;
+      }
+      throw {
+        type: errorType,
+        message: errorMsg,
+      };
+    }
+    return body;
   }
 
-  _wrapWithPromise(rqst) {
-    let promise = new Promise((resolve, reject) => {
-      fetch(rqst.uri, rqst).then(resp => {
-        resp.json().then(json => {
-          if (resp.ok) {
-            resolve(json);
-          } else {
-            reject(Client.ERR_SERVER,
-                   'server responded failure: '
-                   + `${resp.status} ${response.statusText} - ${json.title}`);
-          }
-        }).catch(err => {
-          reject(Client.ERR_RESPONSE, `reading response has failed: ${err}`);
-        });
-      }).catch(err => {
-        reject(Client.ERR_REQUEST, `sending request has failed: ${err}`);
-      });
-    });
-    return promise;
+  /**
+   * Return the server-side API version.
+   */
+  getServerVersion() {
+    let rqst = this.newUnsignedRequest('GET', '', null);
+    return this._wrapWithPromise(rqst);
   }
 
   /**
