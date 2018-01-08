@@ -84,7 +84,7 @@ class Client {
     this.code = null;
     this.kernelId = null;
     this.kernelType = null;
-    this.clientVersion = '0.2.0';  // TODO: read from package.json?
+    this.clientVersion = '0.4.0';  // TODO: read from package.json?
     this.agentSignature = agentSignature;
     if (config === undefined) {
       this._config = ClientConfig.createFromEnv();
@@ -154,7 +154,7 @@ class Client {
    */
   createIfNotExists(kernelType, sessionId) {
     if (sessionId === undefined)
-      sessionId = "backend-ai-live-code-runner";
+      sessionId = this.generateSessionId();
     let params = {
       "lang": kernelType,
       "clientSessionToken": sessionId,
@@ -320,6 +320,14 @@ class Client {
     let k1 = this.sign(secret_key, 'utf8', this.getCurrentDate(now), 'binary');
     let k2 = this.sign(k1, 'binary', this._config.endpointHost, 'binary');
     return k2;
+  }
+  
+  generateSessionId() {
+    var text = "backend-ai-client-js-";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < 8; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
   }
 }
 
