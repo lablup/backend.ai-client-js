@@ -12,6 +12,7 @@ This client library supports Backend.AI API v2.
 ```console
 $ npm install backend.ai-client
 ```
+You can also use `yarn`.
 
 ## Usage
 
