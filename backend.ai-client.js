@@ -1,18 +1,12 @@
 'use babel';
 /*
-Backend.AI Cloud Javascript API Library (v2.9)
+Backend.AI Cloud Javascript API Library (v3.0a1)
 ==============================================
 
 (C) Copyright 2016-2018 Lablup Inc.
 Licensed under MIT
 */
 /*jshint esnext: true */
-
-if (typeof fetch === 'undefined') {
-  var fetch = require('node-fetch');
-  var Headers = fetch.Headers;
-}
-var crypto = require('crypto');
 
 class ClientConfig {
   constructor(accessKey, secretKey, endpoint) {
