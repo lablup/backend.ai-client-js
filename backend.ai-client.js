@@ -8,6 +8,10 @@ Licensed under MIT
 */
 /*jshint esnext: true */
 
+var fetch = require('node-fetch');
+var Headers = fetch.Headers;
+var crypto = require('crypto');
+
 class ClientConfig {
   constructor(accessKey, secretKey, endpoint) {
     // fixed configs with this implementation
@@ -222,6 +226,25 @@ class Client {
                 + (this.agentSignature ? ('; ' + this.agentSignature) : '');
     return uaSig;
   }
+  /* GraphQL requests */
+  gql(q, v) {
+    let query = {
+      'query': q,
+      'variables': v
+    }
+    let rqst = this.newSignedRequest('POST', `/admin/graphql`, query);
+    return this._wrapWithPromise(rqst);
+  }
+  test_gql(){
+    let status = 'RUNNING';
+    let fields = ["sess_id","lang","created_at", "terminated_at", "status", "mem_slot", "cpu_slot", "gpu_slot", "cpu_used", "io_read_bytes", "io_write_bytes"];
+    let q = `query($ak:String, $status:String) {`+
+    `  compute_sessions(access_key:$ak, status:$status) { ${fields.join(" ")} }`+
+    '}';
+    let v = {'status': 'RUNNING', 'ak': this._config.accessKey};
+    var a = this.gql(q, v);
+    console.log(a);
+  }
 
   /**
    * Generate a RequestInfo object that can be passed to fetch() API,
@@ -315,9 +338,9 @@ class Client {
     let k2 = this.sign(k1, 'binary', this._config.endpointHost, 'binary');
     return k2;
   }
-  
+
   generateSessionId() {
-    var text = "backend-ai-client-js-";
+    var text = "backend-ai-SDK-js-";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     for (var i = 0; i < 8; i++)
         text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -350,13 +373,11 @@ const backend = {
   ClientConfig: ClientConfig,
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-  // for use like "ai.backend.Client"
-  module.exports.backend = backend;
-  // for classical uses
-  module.exports.Client = Client;
-  module.exports.ClientConfig = ClientConfig;
-  // legacy aliases
-  module.exports.BackendAIClient = Client;
-  module.exports.BackendAIClientConfig = ClientConfig;
-}
+// for use like "ai.backend.Client"
+module.exports.backend = backend;
+// for classical uses
+module.exports.Client = Client;
+module.exports.ClientConfig = ClientConfig;
+// legacy aliases
+module.exports.BackendAIClient = Client;
+module.exports.BackendAIClientConfig = ClientConfig;

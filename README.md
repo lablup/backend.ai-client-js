@@ -1,11 +1,11 @@
-# Backend.AI Client for Javascript (ES6+)
+# Backend.AI Client for Javascript (node.js / ES6+)
 
 ## Requirements
 
-This client SDK runs on ES6-compatible Javascript runtimes with async/await supports
+This client SDK runs on CommonJs (with node.js) / ES6-compatible Javascript runtimes with async/await supports
 such as NodeJS 7+ and modern web browsers released since 2017.
 
-This client library supports Backend.AI API v2.
+This client library supports Backend.AI API v2/3.
 
 ## Install
 
@@ -14,11 +14,15 @@ $ npm install backend.ai-client
 ```
 You can also use `yarn`.
 
+```console
+$ yarn install backend.ai-client
+```
+
 ## Usage
 
 TypeScript:
 ```typescript
-import * as ai from 'backend.ai-client';
+import * as ai from 'backend.ai-client-node';
 
 let config = ai.backend.ClientConfig.createFromEnv();
 let client = new ai.backend.Client(config);
@@ -26,10 +30,24 @@ let client = new ai.backend.Client(config);
 
 CommonJS-style:
 ```javascript
-const ai = require('backend.ai-client');
+const ai = require('backend.ai-client-node');
 
 let config = ai.backend.ClientConfig.createFromEnv();
 let client = new ai.backend.Client(config);
+```
+
+ES6:
+```
+import './backend.ai-client-es6.js';
+let config = new ai.backend.ClientConfig(
+  '[ADD_ACCESS_KEY_HERE]',
+  '[ADD_SECRET_KEY_HERE]',
+  '[ENDPOINT_HERE]'
+);
+let client = new ai.backend.Client(
+  config,
+  `Backend.AI ES6 App.`,
+);
 ```
 
 When creating `ClientConfig` object, you can manually pass `accessKey`,
@@ -59,7 +77,7 @@ client.createIfNotExists('python:latest', 'my-session-id')
 ```
 
 The result objects returned with success has different formats API by API.
-Please check out [our official documentation](http://docs.backend.ai).
+Please check out [our official documentation](https://www.backend.ai/#/docs/index).
 
 `err.type` is one of the following values:
 
