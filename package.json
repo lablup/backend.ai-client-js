@@ -29,6 +29,7 @@
     "node-fetch": "^1.6.3"
   },
   "devDependencies": {
-    "node-fetch": "^1.6.3"
+    "node-fetch": "^1.6.3",
+    "browserify": "^16.2.3"
   }
 }
