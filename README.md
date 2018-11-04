@@ -39,6 +39,7 @@ let client = new ai.backend.Client(config);
 ES6:
 ```
 import './backend.ai-client-es6.js';
+
 let config = new ai.backend.ClientConfig(
   '[ADD_ACCESS_KEY_HERE]',
   '[ADD_SECRET_KEY_HERE]',
