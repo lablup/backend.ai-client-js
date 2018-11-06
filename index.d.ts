@@ -40,6 +40,7 @@ declare module 'backend.ai-client' {
     public getServerVersion(): any;
 
     createIfNotExists(kernelType: string, sessionId: string): any;
+    getInformation(sessionId: string): any;
     destroy(sessionId: string): any;
     restart(sessionId: string): any;
     execute(sessionId: string, runId: string, mode: string, code: string, opts: string): any;
