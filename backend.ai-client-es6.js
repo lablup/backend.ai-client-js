@@ -29,8 +29,8 @@ var crypto = require('crypto');
 class ClientConfig {
   constructor(accessKey, secretKey, endpoint) {
     // fixed configs with this implementation
-    this._apiVersionMajor = 'v2';
-    this._apiVersion = 'v2.20170315';
+    this._apiVersionMajor = 'v3';
+    this._apiVersion = 'v3.20170615';
     this._hashType = 'sha256';
     // dynamic configs
     if (accessKey === undefined || accessKey === null)
@@ -110,6 +110,9 @@ class Client {
     let errorMsg;
     let resp, body;
     try {
+      if (rqst.method == 'GET') {
+        rqst.body = undefined;
+      }
       resp = await fetch(rqst.uri, rqst);
       errorType = Client.ERR_RESPONSE;
       let contentType = resp.headers.get('Content-Type');
@@ -153,7 +156,7 @@ class Client {
    * Return the server-side API version.
    */
   getServerVersion() {
-    let rqst = this.newUnsignedRequest('GET', '', null);
+    let rqst = this.newPublicRequest('GET', '', null, '');
     return this._wrapWithPromise(rqst);
   }
 
@@ -313,7 +316,12 @@ class Client {
    * Same to newRequest() method but it does not sign the request.
    * Use this for unauthorized public APIs.
    */
+
   newUnsignedRequest(method, queryString, body) {
+    return this.newPublicRequest(method, queryString, body, this._config.apiVersionMajor);
+  }
+
+  newPublicRequest(method, queryString, body, urlPrefix) {
     let d = new Date();
     let hdrs = new Headers({
       "Content-Type": "application/json",
@@ -321,7 +329,7 @@ class Client {
       "X-BackendAI-Version": this._config.apiVersion,
       "X-BackendAI-Date": d.toISOString()
     });
-    queryString = '/' + this._config.apiVersionMajor + queryString;
+    queryString = '/' + urlPrefix + queryString;
     let requestInfo = {
       method: method,
       headers: hdrs,
@@ -331,6 +339,7 @@ class Client {
     };
     return requestInfo;
   }
+
 
   getAuthenticationString(method, queryString, dateValue, bodyValue) {
     let bodyHash = crypto.createHash(this._config.hashType)
