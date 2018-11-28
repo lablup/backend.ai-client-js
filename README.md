@@ -18,6 +18,12 @@ You can also use `yarn`.
 $ yarn install backend.ai-client
 ```
 
+## Build
+
+```
+$ make es6
+```
+
 ## Usage
 
 TypeScript:
