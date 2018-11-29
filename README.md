@@ -21,6 +21,7 @@ $ yarn install backend.ai-client
 ## Build
 
 ```
+$ npm install -g browserify
 $ make es6
 ```
 
