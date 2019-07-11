@@ -4,7 +4,8 @@
   "description": "Backend.AI Client for javascript",
   "main": "backend.ai-client.js",
   "scripts": {
-    "test": ""
+    "test": "",
+    "build-doc": "./node_modules/jsdoc/jsdoc.js -c ./jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -29,7 +30,9 @@
     "node-fetch": "^1.6.3"
   },
   "devDependencies": {
-    "node-fetch": "^1.6.3",
-    "browserify": "^16.2.3"
+    "browserify": "^16.2.3",
+    "docdash": "^1.1.1",
+    "jsdoc": "^3.6.2",
+    "node-fetch": "^1.6.3"
   }
 }
