@@ -20,9 +20,28 @@ $ yarn install backend.ai-client
 
 ## Build
 
+### Package preparation
+
+NPM: 
+```console
+$ npm i
 ```
-$ npm install -g browserify
+
+Yarn:
+```console
+$ yarn install
+```
+
+### ES6+ library
+
+```console
 $ make es6
+```
+
+### Node.js library
+
+```console
+$ make node 
 ```
 
 ## Usage
@@ -43,7 +62,7 @@ let config = ai.backend.ClientConfig.createFromEnv();
 let client = new ai.backend.Client(config);
 ```
 
-ES6:
+ES6+:
 ```
 import './backend.ai-client-es6.js';
 
