@@ -1,6 +1,6 @@
 {
   "name": "backend.ai-client",
-  "version": "19.11.0",
+  "version": "19.12.0",
   "description": "Backend.AI Client for javascript",
   "main": "backend.ai-client.js",
   "scripts": {
