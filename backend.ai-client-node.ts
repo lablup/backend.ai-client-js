@@ -1,9 +1,9 @@
 'use babel';
 /*
-Backend.AI API Library / SDK for Node.JS / Javascript ES6 (v19.07.2)
+Backend.AI API Library / SDK for Node.JS / Javascript ES6 (v20.01.0)
 ====================================================================
 
-(C) Copyright 2016-2019 Lablup Inc.
+(C) Copyright 2016-2020 Lablup Inc.
 Licensed under MIT
 */
 /*jshint esnext: true */
@@ -29,7 +29,7 @@ class ClientConfig {
   public _secretKey: string;
   public _userId: string;
   public _password: string;
-  public _proxyURL: string;
+  public _proxyURL: any;
   public _connectionMode: string;
 
   /**
@@ -41,8 +41,8 @@ class ClientConfig {
    * @param {string} connectionMode - connection mode. 'API', 'SESSION' is supported. `SESSION` mode requires console-server.
    */
   constructor(accessKey, secretKey, endpoint, connectionMode = 'API') {
-    // fixed configs with this implementation
-    this._apiVersionMajor = 'v4';
+    // default configs.
+    this._apiVersionMajor = '4';
     this._apiVersion = 'v4.20190315'; // For compatibility with 19.03 / 1.4
     this._hashType = 'sha256';
     if (endpoint === undefined || endpoint === null)
@@ -132,13 +132,14 @@ class ClientConfig {
 
 class Client {
   public code: any;
-  public kernelId: string | null;
+  public sessionId: string | null;
   public kernelType: any;
   public clientVersion: string;
   public agentSignature: any;
   public _config: any;
   public _managerVersion: any;
   public _apiVersion: any;
+  public _apiVersionMajor: any;
   public is_admin: boolean;
   public is_superadmin: boolean;
   public kernelPrefix: any;
@@ -157,6 +158,8 @@ class Client {
   public maintenance: Maintenance;
   public scalingGroup: ScalingGroup;
   public registry: Registry;
+  public setting: Setting;
+  public userConfig: UserConfig;
   public _features: any;
   public ready: boolean = false;
   static ERR_REQUEST: any;
@@ -172,7 +175,7 @@ class Client {
    */
   constructor(config, agentSignature) {
     this.code = null;
-    this.kernelId = null;
+    this.sessionId = null;
     this.kernelType = null;
     this.clientVersion = '19.09.0';
     this.agentSignature = agentSignature;
@@ -183,6 +186,7 @@ class Client {
     }
     this._managerVersion = null;
     this._apiVersion = null;
+    this._apiVersionMajor = null;
     this.is_admin = false;
     this.is_superadmin = false;
     this.kernelPrefix = '/kernel';
@@ -201,6 +205,8 @@ class Client {
     this.maintenance = new Maintenance(this);
     this.scalingGroup = new ScalingGroup(this);
     this.registry = new Registry(this);
+    this.setting = new Setting(this);
+    this.userConfig = new UserConfig(this);
     this.domain = new Domain(this);
 
     this._features = {}; // feature support list
@@ -218,6 +224,12 @@ class Client {
   }
 
   /**
+   * Return the server-side manager version.
+   */
+  get apiVersion() {
+    return this._apiVersion;
+  }
+  /**
    * Promise wrapper for asynchronous request to Backend.AI manager.
    *
    * @param {Request} rqst - Request object to send
@@ -227,6 +239,7 @@ class Client {
     let errorTitle = '';
     let errorMsg;
     let resp, body;
+
     try {
       if (rqst.method == 'GET') {
         rqst.body = undefined;
@@ -295,13 +308,47 @@ class Client {
           errorMsg = 'server responded failure: '
             + `${resp.status} ${resp.statusText} - ${body.title}`;
       }
-
       throw {
+        isError: true,
+        timestamp: new Date().toUTCString(),
         type: errorType,
+        requestUrl: rqst.uri,
+        requestMethod: rqst.method,
+        requestParameters: rqst.body,
+        statusCode: resp.status,
+        statusText: resp.statusText,
         title: errorTitle,
         message: errorMsg,
       };
     }
+
+    let previous_log = JSON.parse(localStorage.getItem('backendaiconsole.logs'));
+    if (previous_log) {
+      if (previous_log.length > 5000) {
+        previous_log = previous_log.slice(1, 5000);
+      }
+    }
+    let log_stack = Array();
+    let current_log = {
+      "isError" : false,
+      "timestamp" : new Date().toUTCString(),
+      "type" : "",
+      "requestUrl" : rqst.uri,
+      "requestMethod" : rqst.method,
+      "requestParameters" : rqst.body,
+      "statusCode" : resp.status,
+      "statusText" : resp.statusText,
+      "title" : body.title,
+      "message" : ""
+    };
+
+    log_stack.push(current_log);
+
+    if(previous_log) {
+      log_stack = log_stack.concat(previous_log);
+    }
+    localStorage.setItem('backendaiconsole.logs', JSON.stringify(log_stack));
+
     return body;
   }
 
@@ -314,6 +361,21 @@ class Client {
   }
 
   /**
+   * Get API major version
+   */
+  get APIMajorVersion() {
+    return this._apiVersionMajor;
+  }
+
+  /**
+   * Force API major version
+   */
+  set APIMajorVersion(value) {
+    this._apiVersionMajor = value;
+    this._config._apiVersionMajor = this._apiVersionMajor; // To upgrade API version with server version
+  }
+
+  /**
    * Get the server-side manager version.
    */
   async getManagerVersion() {
@@ -322,6 +384,11 @@ class Client {
       this._managerVersion = v.manager;
       this._apiVersion = v.version;
       this._config._apiVersion = this._apiVersion; // To upgrade API version with server version
+      this._apiVersionMajor = v.version.substr(1, 2);
+      this._config._apiVersionMajor = this._apiVersionMajor; // To upgrade API version with server version
+      if (this._apiVersionMajor > 4) {
+        this.kernelPrefix = '/session';
+      }
     }
     return this._managerVersion;
   }
@@ -338,6 +405,21 @@ class Client {
     } else {
       return false;
     }
+  }
+
+  _updateFieldCompatibilityByAPIVersion(fields) {
+    const v4_replacements = {
+      'session_name': 'sess_id'
+    };
+    if (this._apiVersionMajor < 5) { // For V3/V4 API compatibility
+      Object.keys(v4_replacements).forEach(key => {
+        let index = fields.indexOf(key);
+        if (index !== -1) {
+          fields[index] = v4_replacements[key];
+        }
+      });
+    }
+    return fields;
   }
 
   _updateSupportList() {
@@ -439,6 +521,20 @@ class Client {
   }
 
   /**
+   * Update user's password.
+   *
+   */
+  async updatePassword(oldPassword, newPassword, newPassword2) {
+    let body = {
+      'old_password': oldPassword,
+      'new_password': newPassword,
+      'new_password2': newPassword2
+    };
+    let rqst = this.newSignedRequest('POST', `/auth/update-password`, body);
+    return this._wrapWithPromise(rqst);
+  }
+
+  /**
    * Return the resource slots.
    */
   async getResourceSlots() {
@@ -474,13 +570,19 @@ class Client {
       if (resources['mem']) {
         config['mem'] = resources['mem'];
       }
-      if (resources['gpu']) { // Temporary fix for resource handling
-        config['cuda.device'] = parseFloat(resources['gpu']).toFixed(2);
+      if (resources['gpu']) { // Legacy support (till 19.09)
+        config['cuda.device'] = parseInt(resources['gpu']);
       }
-      if (resources['vgpu']) { // Temporary fix for resource handling
+      if (resources['cuda.device']) { // Generalized device information from 20.03
+        config['cuda.device'] = parseInt(resources['cuda.device']);
+      }
+      if (resources['vgpu']) { // Legacy support (till 19.09)
         config['cuda.shares'] = parseFloat(resources['vgpu']).toFixed(2); // under 19.03
       } else if (resources['fgpu']) {
         config['cuda.shares'] = parseFloat(resources['fgpu']).toFixed(2); // 19.09 and above
+      }
+      if (resources['cuda.shares']) { // Generalized device information from 20.03
+        config['cuda.shares'] = parseFloat(resources['cuda.shares']).toFixed(2);
       }
       if (resources['tpu']) {
         config['tpu.device'] = resources['tpu'];
@@ -547,6 +649,7 @@ class Client {
    * Obtain the session information by given sessionId.
    *
    * @param {string} sessionId - the sessionId given when created
+   * @param {string | null} ownerKey - owner key to access
    */
   getLogs(sessionId, ownerKey = null) {
     let queryString = `${this.kernelPrefix}/${sessionId}/logs`;
@@ -613,16 +716,16 @@ class Client {
     return this.createIfNotExists(kernelType, sessionId, resources);
   }
 
-  destroyKernel(kernelId, ownerKey = null) {
-    return this.destroy(kernelId, ownerKey);
+  destroyKernel(sessionId, ownerKey = null) {
+    return this.destroy(sessionId, ownerKey);
   }
 
-  refreshKernel(kernelId, ownerKey = null) {
-    return this.restart(kernelId, ownerKey);
+  refreshKernel(sessionId, ownerKey = null) {
+    return this.restart(sessionId, ownerKey);
   }
 
-  runCode(code, kernelId, runId, mode) {
-    return this.execute(kernelId, runId, mode, code, {});
+  runCode(code, sessionId, runId, mode) {
+    return this.execute(sessionId, runId, mode, code, {});
   }
 
   upload(sessionId, path, fs) {
@@ -1015,6 +1118,17 @@ class VFolder {
   }
 
   /**
+   * Rename a Virtual folder.
+   *
+   * @param {string} new_name - New virtual folder name.
+   */
+  rename(new_name = null) {
+    const body = {new_name};
+    let rqst = this.client.newSignedRequest('POST', `${this.urlPrefix}/${this.name}/rename`, body);
+    return this.client._wrapWithPromise(rqst);
+  }
+
+  /**
    * Delete a Virtual folder.
    *
    * @param {string} name - Virtual folder name. If no name is given, use name on this VFolder object.
@@ -1055,6 +1169,32 @@ class VFolder {
   uploadFormData(fss, name = null) {
     let rqst = this.client.newSignedRequest('POST', `${this.urlPrefix}/${name}/upload`, fss);
     return this.client._wrapWithPromise(rqst);
+  }
+
+  /**
+   * Create a upload session for a file to Virtual folder.
+   *
+   * @param {string} path - Path to upload.
+   * @param {string} fs - File object to upload.
+   * @param {string} name - Virtual folder name.
+   */
+  async create_upload_session(path, fs, name = null) {
+    if (name == null) {
+      name = this.name;
+    }
+    let body = {
+      'path': path,
+      'size': fs.size
+    };
+    let rqst = this.client.newSignedRequest('POST', `${this.urlPrefix}/${name}/create_upload_session`, body);
+    const res = await this.client._wrapWithPromise(rqst);
+    const token = res['token'];
+    let url = this.client._config.endpoint;
+    if (this.client._config.connectionMode === 'SESSION') {
+      url = url + '/func';
+    }
+    url = url + `${this.urlPrefix}/_/tus/upload/${token}`;
+    return url;
   }
 
   /**
@@ -1110,6 +1250,51 @@ class VFolder {
     let q = querystring.stringify(params);
     let rqst = this.client.newSignedRequest('GET', `${this.urlPrefix}/${name}/download_single?${q}`, null);
     return this.client._wrapWithPromise(rqst, true);
+  }
+
+  /**
+   * Request a download and get the token for direct download.
+   *
+   * @param {string} file - File to download. Should contain full path.
+   * @param {string} name - Virtual folder name that files are in.
+   */
+  request_download_token(file, name = false) {
+    let body = {
+      'file': file
+    };
+    let rqst = this.client.newSignedRequest('POST', `${this.urlPrefix}/${name}/request_download`, body);
+    return this.client._wrapWithPromise(rqst);
+  }
+
+  /**
+   * Download file in a Virtual folder with token.
+   *
+   * @param {string} token - Temporary token to download specific file.
+   */
+  download_with_token(token: string = '') {
+    let params = {
+      'token': token
+    };
+    let q = querystring.stringify(params);
+    let rqst = this.client.newSignedRequest('GET', `${this.urlPrefix}/_/download_with_token?${q}`, null);
+    return this.client._wrapWithPromise(rqst, true);
+  }
+
+  /**
+   * Get download URL in a Virtual folder with token.
+   *
+   * @param {string} token - Temporary token to download specific file.
+   */
+  get_download_url_with_token(token: string = '') {
+    let params = {
+      'token': token
+    };
+    let q = querystring.stringify(params);
+    if (this.client._config.connectionMode === 'SESSION') {
+      return `${this.client._config.endpoint}/func${this.urlPrefix}/_/download_with_token?${q}`;
+    } else {
+      return `${this.client._config.endpoint}${this.urlPrefix}/_/download_with_token?${q}`;
+    }
   }
 
   /**
@@ -1345,7 +1530,7 @@ class Keypair {
       'concurrency_limit',
       'rate_limit'
     ];
-    if (accessKey !== null || accessKey !== '') {
+    if (accessKey !== null && accessKey !== '') {
       fields = fields.concat(['access_key', 'secret_key']);
     }
     let q = `mutation($user_id: String!, $input: KeyPairInput!) {` +
@@ -1354,7 +1539,7 @@ class Keypair {
       `  }` +
       `}`;
     let v;
-    if (accessKey !== null || accessKey !== '') {
+    if (accessKey !== null && accessKey !== '') {
       v = {
         'user_id': userId,
         'input': {
@@ -1642,18 +1827,20 @@ class ContainerImage {
    * install specific container images from registry
    *
    * @param {string} name - name to install. it should contain full path with tags. e.g. lablup/python:3.6-ubuntu18.04
+   * @param {object} resource - resource to use for installation.
    * @param {string} registry - registry of image. default is 'index.docker.io', which is public Backend.AI docker registry.
    */
-  install(name, registry: string = 'index.docker.io') {
+  install(name, resource: object = {}, registry: string = 'index.docker.io') {
     if (registry != 'index.docker.io') {
       registry = registry + '/';
     } else {
       registry = '';
     }
     let sessionId = this.client.generateSessionId();
-    return this.client.createIfNotExists(registry + name, sessionId, {
-      'cpu': '1', 'mem': '512m',
-    }).then((response) => {
+    if (Object.keys(resource).length === 0) {
+      resource = {'cpu': '1', 'mem': '512m'};
+    }
+    return this.client.createIfNotExists(registry + name, sessionId, resource).then((response) => {
       return this.client.destroyKernel(sessionId);
     }).catch(err => {
       throw err;
@@ -1701,17 +1888,18 @@ class ComputeSession {
   /**
    * list compute sessions with specific conditions.
    *
-   * @param {array} fields - fields to query. Default fields are: ["sess_id", "lang", "created_at", "terminated_at", "status", "status_info", "occupied_slots", "cpu_used", "io_read_bytes", "io_write_bytes"]
+   * @param {array} fields - fields to query. Default fields are: ["session_name", "lang", "created_at", "terminated_at", "status", "status_info", "occupied_slots", "cpu_used", "io_read_bytes", "io_write_bytes"].
    * @param {string or array} status - status to query. Default is 'RUNNING'. Available statuses are: `PREPARING`, `BUILDING`, `RUNNING`, `RESTARTING`, `RESIZING`, `SUSPENDED`, `TERMINATING`, `TERMINATED`, `ERROR`.
    * @param {string} accessKey - access key that is used to start compute sessions.
    * @param {number} limit - limit number of query items.
    * @param {number} offset - offset for item query. Useful for pagination.
    * @param {string} group - project group id to query. Default returns sessions from all groups.
    */
-  async list(fields = ["sess_id", "lang", "created_at", "terminated_at", "status", "status_info", "occupied_slots", "cpu_used", "io_read_bytes", "io_write_bytes"],
+  async list(fields = ["session_name", "lang", "created_at", "terminated_at", "status", "status_info", "occupied_slots", "cpu_used", "io_read_bytes", "io_write_bytes"],
              status = 'RUNNING', accessKey = '', limit = 30, offset = 0, group = '') {
     if (accessKey === '') accessKey = null;
     if (group === '') group = null;
+    fields = this.client._updateFieldCompatibilityByAPIVersion(fields); // For V3/V4 API compatibility
     let q, v;
     q = `query($limit:Int!, $offset:Int!, $ak:String, $group_id:String, $status:String) {
       compute_session_list(limit:$limit, offset:$offset, access_key:$ak, group_id:$group_id, status:$status) {
@@ -1727,6 +1915,42 @@ class ComputeSession {
     };
     if (accessKey != null) {
       v['ak'] = accessKey;
+    }
+    if (group != null) {
+      v['group_id'] = group;
+    }
+    return this.client.gql(q, v);
+  }
+
+  /**
+   * list all status of compute sessions.
+   *
+   * @param {array} fields - fields to query. Default fields are: ["session_name", "lang", "created_at", "terminated_at", "status", "status_info", "occupied_slots", "cpu_used", "io_read_bytes", "io_write_bytes"].
+   * @param {string} accessKey - access key that is used to start compute sessions.
+   * @param {number} limit - limit number of query items.
+   * @param {number} offset - offset for item query. Useful for pagination.
+   * @param {string} group - project group id to query. Default returns sessions from all groups.
+   */
+  async listAll(fields = ["session_name", "lang", "created_at", "terminated_at", "status", "status_info", "occupied_slots", "cpu_used", "io_read_bytes", "io_write_bytes"], accessKey = '', group = '') {
+    if (accessKey === '') accessKey = null;
+    if (group === '') group = null;
+    fields = this.client._updateFieldCompatibilityByAPIVersion(fields);
+    // For V3/V4 API compatibility
+    let q, v;
+    q = `query($domain_name:String, $group_id:String, $ak:String, $status:String) {
+      compute_sessions(domain_name:$domain_name, group_id:$group_id, access_key:$ak, status:$status) {
+        ${fields.join(" ")}
+      }
+    }`;
+
+    v = {
+      // domain_name: null,
+      // group_id: null,
+      // access_key: accessKey,
+      // status: status
+    };
+    if (accessKey != null) {
+      v['access_key'] = accessKey;
     }
     if (group != null) {
       v['group_id'] = group;
@@ -1859,8 +2083,8 @@ class Group {
 
   /**
    * List registred groups.
-   * @param {string} domain_name - domain name of group
    * @param {boolean} is_active - List whether active users or inactive users.
+   * @param {string} domain_name - domain name of group
    * {
    *   'name': String,          // Group name.
    *   'description': String,   // Description for group.
@@ -1888,10 +2112,10 @@ class Group {
         };
       }
     } else {
-      q = `query {` +
-        `  groups { ${fields.join(" ")} }` +
+      q = `query($is_active:Boolean) {` +
+        `  groups(is_active:$is_active) { ${fields.join(" ")} }` +
         '}';
-      v = {};
+      v = {'is_active': is_active};
     }
     return this.client.gql(q, v);
   }
@@ -1972,6 +2196,7 @@ class Maintenance {
     if (this.client.is_admin === true) {
       let q, v;
       if (registry !== '') {
+        registry = decodeURIComponent(registry);
         q = `mutation($registry: String) {` +
           `  rescan_images(registry: $registry) {` +
           `    ok msg ` +
@@ -2317,17 +2542,176 @@ class Registry {
   }
 
   add(key, value) {
-    const rqst = this.client.newSignedRequest("POST", "/config/set", {key, value});
+    key = encodeURIComponent(key);
+    let regkey = `config/docker/registry/${key}`;
+    const rqst = this.client.newSignedRequest("POST", "/config/set", {
+      key: regkey,
+      value
+    });
     return this.client._wrapWithPromise(rqst);
   }
 
   delete(key) {
+    key = encodeURIComponent(key);
     const rqst = this.client.newSignedRequest("POST", "/config/delete", {
       "key": `config/docker/registry/${key}`,
       "prefix": true
     });
     return this.client._wrapWithPromise(rqst);
   }
+}
+
+class Setting {
+  public client: any;
+  public config: any;
+  /**
+   * Setting API wrapper.
+   *
+   * @param {Client} client - the Client API wrapper object to bind
+   */
+  constructor(client) {
+    this.client = client;
+    this.config = null;
+  }
+  /**
+   * List settings
+   *
+   * @param {string} prefix - prefix to get. This command will return every settings starting with the prefix.
+   */
+  list(prefix = "") {
+    prefix = `config/${prefix}`;
+    const rqst = this.client.newSignedRequest("POST", "/config/get", {"key": prefix, "prefix": true});
+    return this.client._wrapWithPromise(rqst);
+  }
+  /**
+   * Get settings
+   *
+   * @param {string} prefix - prefix to get. This command will return every settings starting with the prefix.
+   */
+  get(key) {
+    key = `config/${key}`;
+    const rqst = this.client.newSignedRequest("POST", "/config/get", {"key": key, "prefix": false});
+    return this.client._wrapWithPromise(rqst);
+  }
+  /**
+   * Set a setting
+   *
+   * @param {string} key - key to add.
+   * @param {string} value - value to add.
+   */
+  set(key, value) {
+    key = `config/${key}`;
+    const rqst = this.client.newSignedRequest("POST", "/config/set", {key, value});
+    return this.client._wrapWithPromise(rqst);
+  }
+  /**
+   * Delete a setting
+   *
+   * @param {string} key - key to delete
+   * @param {boolean} prefix - prefix to delete. if prefix is true, this command will delete every settings starting with the key.
+   */
+  delete(key, prefix = false) {
+    key = `config/${key}`;
+    const rqst = this.client.newSignedRequest("POST", "/config/delete", {
+      "key": `${key}`,
+      "prefix": prefix
+    });
+    return this.client._wrapWithPromise(rqst);
+  }
+}
+
+class UserConfig {
+  public client: any;
+  public config: any;
+  /**
+   * Setting API wrapper.
+   *
+   * @param {Client} client - the Client API wrapper object to bind
+   */
+  constructor(client: Client) {
+    this.client = client;
+    this.config = null;
+  }
+  /**
+   * Get content of bootstrap script of a keypair.
+   */
+  get_bootstrap_script() {
+    if (!this.client._config.accessKey) {
+      throw 'Your access key is not set';
+    }
+    const rqst = this.client.newSignedRequest('GET', '/user-config/bootstrap-script');
+    return this.client._wrapWithPromise(rqst);
+  }
+  /**
+   * Update bootstrap script of a keypair.
+   *
+   * @param {string} data - text content of bootstrap script.
+   */
+  update_bootstrap_script(script: string) {
+    const rqst = this.client.newSignedRequest("POST", "/user-config/bootstrap-script", {script});
+    return this.client._wrapWithPromise(rqst);
+  }
+  /**
+   * Create content of script dotfile (.bashrc or .zshrc)
+   * @param {string} data - text content of script dotfile
+   * @param {string} path - path of script dotfile. (cwd: home directory)
+   */
+  create_dotfile_script(data: string ='', path: string) {
+    if (!this.client._config.accessKey) {
+      throw 'Your access key is not set';
+    }
+    let params = {
+      "path": path,
+      "data": data,
+      "permission" : '644'
+    };
+    const rqst = this.client.newSignedRequest("POST", "/user-config/dotfiles", params);
+    return this.client._wrapWithPromise(rqst);
+  }
+
+  /**
+   * Get content of script dotfile
+   */
+  get_dotfile_script() {
+    if (!this.client._config.accessKey) {
+      throw 'Your access key is not set';
+    }
+    // let params = {
+    //   "owner_access_key" : this.client._config.accessKey
+    // }
+    const rqst = this.client.newSignedRequest("GET", "/user-config/dotfiles");
+    return this.client._wrapWithPromise(rqst);
+  }
+
+  /**
+   * Update script dotfile of a keypair.
+   *
+   * @param {string} data - text content of script dotfile.
+   * @param {string} path - path of script dotfile. (cwd: home directory)
+   */
+  update_dotfile_script(data: string, path: string) {
+    let params = {
+      "data" : data,
+      "path" : path,
+      "permission" : '644'
+    }
+    const rqst = this.client.newSignedRequest("PATCH", "/user-config/dotfiles", params);
+    return this.client._wrapWithPromise(rqst);
+  }
+
+  /**
+   * Delete script dotfile of a keypair.
+   *
+   * @param {string} path - path of script dotfile.
+   */
+  delete_dotfile_script(path: string) {
+    let params = {
+      "path" : path
+    }
+    const rqst = this.client.newSignedRequest("DELETE", "/user-config/dotfiles", params);
+    return this.client._wrapWithPromise(rqst);
+  }
+
 }
 
 class utils {
