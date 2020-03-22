@@ -104,7 +104,7 @@ client.createIfNotExists('python:latest', 'my-session-id')
 ```
 
 The result objects returned with success has different formats API by API.
-Please check out [our official documentation](https://www.backend.ai/#/docs/index).
+Please check out [our official documentation](https://docs.backend.ai/).
 
 `err.type` is one of the following values:
 
