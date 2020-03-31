@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Keypair - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ClientConfig.html">ClientConfig</a><ul class='methods'><li data-type='method'><a href="ClientConfig.html#.createFromEnv">createFromEnv</a></li></ul></li><li><a href="Client.html">Client</a><ul class='methods'><li data-type='method'><a href="Client.html#_wrapWithPromise">_wrapWithPromise</a></li><li data-type='method'><a href="Client.html#getServerVersion">getServerVersion</a></li><li data-type='method'><a href="Client.html#getManagerVersion">getManagerVersion</a></li><li data-type='method'><a href="Client.html#isManagerVersionCompatibleWith">isManagerVersionCompatibleWith</a></li><li data-type='method'><a href="Client.html#isAPIVersionCompatibleWith">isAPIVersionCompatibleWith</a></li><li data-type='method'><a href="Client.html#check_login">check_login</a></li><li data-type='method'><a href="Client.html#login">login</a></li><li data-type='method'><a href="Client.html#logout">logout</a></li><li data-type='method'><a href="Client.html#getResourceSlots">getResourceSlots</a></li><li data-type='method'><a href="Client.html#createIfNotExists">createIfNotExists</a></li><li data-type='method'><a href="Client.html#getInformation">getInformation</a></li><li data-type='method'><a href="Client.html#getLogs">getLogs</a></li><li data-type='method'><a href="Client.html#destroy">destroy</a></li><li data-type='method'><a href="Client.html#restart">restart</a></li><li data-type='method'><a href="Client.html#execute">execute</a></li><li data-type='method'><a href="Client.html#newSignedRequest">newSignedRequest</a></li><li data-type='method'><a href="Client.html#newUnsignedRequest">newUnsignedRequest</a></li></ul></li><li><a href="ResourcePreset.html">ResourcePreset</a><ul class='methods'><li data-type='method'><a href="ResourcePreset.html#list">list</a></li><li data-type='method'><a href="ResourcePreset.html#check">check</a></li><li data-type='method'><a href="ResourcePreset.html#add">add</a></li><li data-type='method'><a href="ResourcePreset.html#mutate">mutate</a></li></ul></li><li><a href="VFolder.html">VFolder</a><ul class='methods'><li data-type='method'><a href="VFolder.html#create">create</a></li><li data-type='method'><a href="VFolder.html#list">list</a></li><li data-type='method'><a href="VFolder.html#list_hosts">list_hosts</a></li><li data-type='method'><a href="VFolder.html#info">info</a></li><li data-type='method'><a href="VFolder.html#delete">delete</a></li><li data-type='method'><a href="VFolder.html#upload">upload</a></li><li data-type='method'><a href="VFolder.html#uploadFormData">uploadFormData</a></li><li data-type='method'><a href="VFolder.html#mkdir">mkdir</a></li><li data-type='method'><a href="VFolder.html#delete_files">delete_files</a></li><li data-type='method'><a href="VFolder.html#download">download</a></li><li data-type='method'><a href="VFolder.html#list_files">list_files</a></li><li data-type='method'><a href="VFolder.html#invite">invite</a></li><li data-type='method'><a href="VFolder.html#invitations">invitations</a></li><li data-type='method'><a href="VFolder.html#accept_invitation">accept_invitation</a></li><li data-type='method'><a href="VFolder.html#delete_invitation">delete_invitation</a></li><li data-type='method'><a href="VFolder.html#list_invitees">list_invitees</a></li><li data-type='method'><a href="VFolder.html#modify_invitee_permission">modify_invitee_permission</a></li></ul></li><li><a href="Agent.html">Agent</a><ul class='methods'><li data-type='method'><a href="Agent.html#list">list</a></li></ul></li><li><a href="Keypair.html">Keypair</a><ul class='methods'><li data-type='method'><a href="Keypair.html#info">info</a></li><li data-type='method'><a href="Keypair.html#list">list</a></li><li data-type='method'><a href="Keypair.html#add">add</a></li><li data-type='method'><a href="Keypair.html#mutate">mutate</a></li><li data-type='method'><a href="Keypair.html#delete">delete</a></li></ul></li><li><a href="ResourcePolicy.html">ResourcePolicy</a><ul class='methods'><li data-type='method'><a href="ResourcePolicy.html#get">get</a></li><li data-type='method'><a href="ResourcePolicy.html#add">add</a></li><li data-type='method'><a href="ResourcePolicy.html#mutate">mutate</a></li></ul></li><li><a href="Image.html">Image</a><ul class='methods'><li data-type='method'><a href="Image.html#list">list</a></li></ul></li><li><a href="ComputeSession.html">ComputeSession</a><ul class='methods'><li data-type='method'><a href="ComputeSession.html#list">list</a></li></ul></li><li><a href="Group.html">Group</a><ul class='methods'><li data-type='method'><a href="Group.html#list">list</a></li></ul></li><li><a href="Maintenance.html">Maintenance</a><ul class='methods'><li data-type='method'><a href="Maintenance.html#rescan_images">rescan_images</a></li></ul></li><li><a href="User.html">User</a><ul class='methods'><li data-type='method'><a href="User.html#list">list</a></li><li data-type='method'><a href="User.html#get">get</a></li><li data-type='method'><a href="User.html#add">add</a></li><li data-type='method'><a href="User.html#modify">modify</a></li><li data-type='method'><a href="User.html#delete">delete</a></li></ul></li><li><a href="ScalingGroup.html">ScalingGroup</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Keypair</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        Keypair
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+    
+
+    <h4 class="name" id="Keypair"><span class="type-signature"></span>new Keypair<span class="signature">(client)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Keypair API wrapper.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>client</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Client.html">Client</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the Client API wrapper object to bind</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="info"><span class="type-signature"></span>info<span class="signature">(accessKey, fields)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Information of specific Keypair.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>accessKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Access key to query information. If client is not authorized as admin, this will be ignored and current API key infomation will be returned.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fields</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Fields to query. Queryable fields are: 'access_key', 'secret_key', 'is_active', 'is_admin', 'user_id', 'created_at', 'last_used',
+'concurrency_limit', 'concurrency_used', 'rate_limit', 'num_queries', 'resource_policy'.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="list"><span class="type-signature"></span>list<span class="signature">(userId, fields)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>List Keypairs of given user ID.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>userId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>User ID to query API keys. If user ID is not given and client is authorized as admin, this will return every keypairs of the manager.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fields</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Fields to query. Queryable fields are: &quot;access_key&quot;, 'is_active', 'is_admin', 'user_id', 'created_at', 'last_used',
+'concurrency_used', 'rate_limit', 'num_queries', 'resource_policy'.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="add"><span class="type-signature"></span>add<span class="signature">(userId, isActive, isAdmin, resourcePolicy, rateLimit, accessKey, secretKey)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Add Keypair with given information.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>userId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>User ID for new Keypair.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isActive</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>true</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>is_active state. Default is True.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isAdmin</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>false</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>is_admin state. Default is False.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>resourcePolicy</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>default</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>resource policy name to assign. Default is <code>default</code>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>rateLimit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">integer</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>1000</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>API rate limit for 900 seconds. Prevents from DDoS attack.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>accessKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Manual access key (optional)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>secretKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Manual secret key. Only works if accessKey is present (optional)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="mutate"><span class="type-signature"></span>mutate<span class="signature">(accessKey, input)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>mutate Keypair for given accessKey.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>accessKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>access key to mutate.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">json</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>new information for mutation. JSON format should follow:
+{
+'is_active': is_active,
+'is_admin': is_admin,
+'resource_policy': resource_policy,
+'rate_limit': rate_limit
+}</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="delete"><span class="type-signature"></span>delete<span class="signature">(accessKey)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Delete Keypair with given accessKey</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>accessKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>access key to delete.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sat Aug 17 2019 11:04:42 GMT+0900 (Korean Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
