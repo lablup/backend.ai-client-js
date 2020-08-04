@@ -115,3 +115,8 @@ Please check out [our official documentation](https://docs.backend.ai/).
   `err.message` includes an exception value passed from your Javascript runtime.
 * `ai.backend.Client.ERR_REQUEST`: An error occurred while sending the request.
   `err.message` includes an exception value passed from your Javascript runtime.
+* `ai.backend.Client.ERR_ABORT`: An error occurred while request aborted by user.
+* `ai.backend.Client.ERR_TIMEOUT`: An error occurred while no response returned during the timeout period.
+* `ai.backend.Client.ERR_UNKNOWN`: An error occurred while unknown error occurs.
+  In this case, `err.message` includes HTTP status and additional error information
+  returned by the API server.
