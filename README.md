@@ -109,21 +109,36 @@ Please check out [our official documentation](https://docs.backend.ai/).
 When you check validation of `user_id` and `password`, follow this.
 
 ```javascript
-client.login().then(reponse => {
-  if (reponse === false) {
-    if (user_id != '' && password != '') {
-      console.log(`Login information mismatch. Please check your login information.`);
-    }
-  } else if (reponse.fail_reason) {
-    if (user_id != '' && password != '') {
-      console.log(`Login failed: ${response.fail_reason}`);
-    }
-  } else {
-    console.log(`Login succeeded.`);
-  }.catch(err => {
-    console.log(`Login failed: ${err.message}`);
-  })
-});
+this.clientConfig = new ai.backend.ClientConfig(
+  this.user_id,
+  this.password,
+  this.api_endpoint,
+  'SESSION'
+);
+this.client = new ai.backend.Client(
+  this.clientConfig,
+  `Backend.AI Console.`,
+);
+let isLogon = await this.client.check_login();
+if (isLogon === false) {
+  this.client.login().then(reponse => {
+    if (reponse === false) {
+      if (this.user_id != '' && this.password != '') {
+        console.log(`Login information mismatch. Please check your login information.`);
+      }
+    } else if (reponse.fail_reason) {
+      if (this.user_id != '' && this.password != '') {
+        console.log(`Login failed: ${response.fail_reason}`);
+      }
+    } else {
+      console.log(`Login succeeded.`);
+    }.catch(err => {
+      console.log(`Login failed: ${err.message}`);
+    })
+  });
+} else {
+  console.log(`Login already succeeded.`)
+}
 ```
 
 `err.type` is one of the following values:
