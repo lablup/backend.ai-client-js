@@ -106,6 +106,26 @@ client.createIfNotExists('python:latest', 'my-session-id')
 The result objects returned with success has different formats API by API.
 Please check out [our official documentation](https://docs.backend.ai/).
 
+When you check validation of `user_id` and `password`, follow this.
+
+```javascript
+client.login().then(reponse => {
+  if (reponse === false) {
+    if (user_id != '' && password != '') {
+      console.log(`Login information mismatch. Please check your login information.`);
+    }
+  } else if (reponse.fail_reason) {
+    if (user_id != '' && password != '') {
+      console.log(`Login failed: ${response.fail_reason}`);
+    }
+  } else {
+    console.log(`Login succeeded.`);
+  }.catch(err => {
+    console.log(`Login failed: ${err.message}`);
+  })
+});
+```
+
 `err.type` is one of the following values:
 
 * `ai.backend.Client.ERR_SERVER`: The server responded with failure.
