@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>Group - Documentation</title>
+    <title>Setting - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Group</h1>
+    <h1 class="page-title">Setting</h1>
     
 
     
@@ -45,7 +45,7 @@
 <header>
     
         <h2>
-        Group
+        Setting
         </h2>
         
     
@@ -59,7 +59,7 @@
 
     
 
-    <h4 class="name" id="Group"><span class="type-signature"></span>new Group<span class="signature">(client)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Setting"><span class="type-signature"></span>new Setting<span class="signature">(client)</span><span class="type-signature"></span></h4>
 
     
 
@@ -106,7 +106,7 @@
 
 
 <div class="description usertext">
-    <p>The group API wrapper.</p>
+    <p>Setting API wrapper.</p>
 </div>
 
 
@@ -211,7 +211,7 @@
 
     
 
-    <h4 class="name" id="list"><span class="type-signature">(async) </span>list<span class="signature">(is_active, domain_name)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="list"><span class="type-signature">(async) </span>list<span class="signature">(prefix)</span><span class="type-signature"></span></h4>
 
     
 
@@ -258,7 +258,423 @@
 
 
 <div class="description usertext">
-    <p>List registred groups.</p>
+    <p>List settings</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>prefix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>prefix to get. This command will return every settings starting with the prefix.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="get"><span class="type-signature">(async) </span>get<span class="signature">(prefix)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Get settings</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>prefix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>prefix to get. This command will return every settings starting with the prefix.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="set"><span class="type-signature">(async) </span>set<span class="signature">(key, value)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Set a setting</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>key to add.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>value to add.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="delete"><span class="type-signature">(async) </span>delete<span class="signature">(key, prefix)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Delete a setting</p>
 </div>
 
 
@@ -298,36 +714,7 @@
 
         <tr>
             
-                <td class="name"><code>is_active</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-                <td class="default">
-                
-                    <code>true</code>
-                
-                </td>
-            
-
-            <td class="description last"><p>List whether active users or inactive users.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>domain_name</code></td>
+                <td class="name"><code>key</code></td>
             
 
             <td class="type">
@@ -344,20 +731,39 @@
             
                 <td class="default">
                 
+                </td>
+            
+
+            <td class="description last"><p>key to delete</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>prefix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
                     <code>false</code>
                 
                 </td>
             
 
-            <td class="description last"><p>domain name of group
-{
-'name': String,          // Group name.
-'description': String,   // Description for group.
-'is_active': Boolean,    // Whether the group is active or not.
-'created_at': String,    // Created date of group.
-'modified_at': String,   // Modified date of group.
-'domain_name': String,   // Domain for group.
-};</p></td>
+            <td class="description last"><p>prefix to delete. if prefix is true, this command will delete every settings starting with the key.</p></td>
         </tr>
 
     
