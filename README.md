@@ -133,9 +133,9 @@ async Login() {
         }
       } else {
         console.log(`Login succeeded.`);
-      }.catch(err => {
+      }
+    }).catch(err => {
         console.log(`Login failed: ${err.message}`);
-      })
     });
   } else {
     console.log(`Login already succeeded.`)
