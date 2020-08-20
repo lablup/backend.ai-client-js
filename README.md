@@ -111,8 +111,8 @@ When you check validation of `user_id` and `password`, follow this.
 ```javascript
 async Login() {
   config = new ai.backend.ClientConfig(
-    'ACCESS_KEY',
-    'SECRET_KEY',
+    'user_id',
+    'password',
     'api_endpoint',
     'SESSION'
   );
