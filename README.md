@@ -106,6 +106,45 @@ client.createIfNotExists('python:latest', 'my-session-id')
 The result objects returned with success has different formats API by API.
 Please check out [our official documentation](https://docs.backend.ai/).
 
+When using backend.ai, you can use with `SESSION` mode or `API` mode.  
+If you want to use backend.ai with `SESSION` mode you need to input `user_id`, `password`, `api_endpoint` and `SESSION` to specify the mode.  
+If you want to use backend.ai with `API` mode you need to input `ACCESS_KEY` and `SECRET_KEY` instead of `user_id` and `password`. Also you don't need to input the mode because `API` mode is default value.
+
+```javascript
+async Login() {
+  config = new ai.backend.ClientConfig(
+    '[ADD_USER_ID_HERE]',
+    '[ADD_PASSWORD_HERE]',
+    '[ENDPOINT_HERE]',
+    '[CONNECTION_MODE_HERE]'
+  );
+  client = new ai.backend.Client(
+    config,
+    `Backend.AI Console.`,
+  );
+  let isLogon = await client.check_login();
+  if (isLogon === false) {
+    client.login().then(reponse => {
+      if (reponse === false) {
+        if (user_id != '' && password != '') {
+          console.log(`Login information mismatch. Please check your login information.`);
+        }
+      } else if (reponse.fail_reason) {
+        if (user_id != '' && password != '') {
+          console.log(`Login failed: ${response.fail_reason}`);
+        }
+      } else {
+        console.log(`Login succeeded.`);
+      }
+    }).catch(err => {
+        console.log(`Login failed: ${err.message}`);
+    });
+  } else {
+    console.log(`Login already succeeded.`)
+  }
+}
+```
+
 `err.type` is one of the following values:
 
 * `ai.backend.Client.ERR_SERVER`: The server responded with failure.
@@ -115,3 +154,8 @@ Please check out [our official documentation](https://docs.backend.ai/).
   `err.message` includes an exception value passed from your Javascript runtime.
 * `ai.backend.Client.ERR_REQUEST`: An error occurred while sending the request.
   `err.message` includes an exception value passed from your Javascript runtime.
+* `ai.backend.Client.ERR_ABORT`: An error occurred while request aborted by user.
+* `ai.backend.Client.ERR_TIMEOUT`: An error occurred while no response returned during the timeout period.
+* `ai.backend.Client.ERR_UNKNOWN`: An error occurred while unknown error occurs.
+  In this case, `err.message` includes HTTP status and additional error information
+  returned by the API server.
