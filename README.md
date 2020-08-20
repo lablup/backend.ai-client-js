@@ -106,15 +106,17 @@ client.createIfNotExists('python:latest', 'my-session-id')
 The result objects returned with success has different formats API by API.
 Please check out [our official documentation](https://docs.backend.ai/).
 
-When you check validation of `user_id` and `password`, follow this.
+When using backend.ai, you can use with `SESSION` mode or `API` mode.  
+If you want to use backend.ai with `SESSION` mode you need to input `user_id`, `password`, `api_endpoint` and `SESSION` to specify the mode.  
+If you want to use backend.ai woth `API` mode you need to input `ACCESS_KEY` and `SECRET_KEY` instead of `user_id` and `password`. Also you don't need to input the mode because `API` mode is default value.
 
 ```javascript
 async Login() {
   config = new ai.backend.ClientConfig(
-    'user_id',
-    'password',
-    'api_endpoint',
-    'SESSION'
+    '[ADD_USER_ID_HERE]',
+    '[ADD_PASSWORD_HERE]',
+    '[ENDPOINT_HERE]',
+    '[CONNECTION_MODE_HERE]'
   );
   client = new ai.backend.Client(
     config,
