@@ -5,7 +5,7 @@
 This client SDK runs on CommonJs (with node.js) / ES6-compatible Javascript runtimes with async/await supports
 such as NodeJS 7+ and modern web browsers released since 2017.
 
-This client library supports Backend.AI API v3/4/5.
+This client library supports Backend.AI API v3/4/5/6.
 
 ## Install
 
