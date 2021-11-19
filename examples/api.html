@@ -15,9 +15,9 @@
                 API Endpoint: <br/>
                 <input type="text" id="api_endpoint" placeholder="https://cloud.backend.ai" value="https://cloud.backend.ai" /><br/>
                 ID: <br/>
-                <input type="text" id="user_id" autocomplete="username" placeholder="Username"/><br/>
+                <input type="text" id="apikey" autocomplete="username" placeholder="API key"/><br/>
                 PW: <br/>
-                <input type="password" id="password" autocomplete="current-password" placeholder="Password"/><br/><br/>
+                <input type="password" id="secretkey" autocomplete="current-password" placeholder="Secret Key"/><br/><br/>
                 <input type="button" id="login_button" value="Login" />
             </form>
         </div>
@@ -38,10 +38,9 @@
             export async function login() {
                 // Create a client configuration object.
                 let config = new ai.backend.ClientConfig(
-                    document.querySelector("#user_id").value,
-                    document.querySelector("#password").value,
-                    document.querySelector("#api_endpoint").value,
-                    "SESSION",
+                    document.querySelector("#apikey").value,
+                    document.querySelector("#secretkey").value,
+                    document.querySelector("#api_endpoint").value
                 );
 
                 // Create a client object with configuration object.
@@ -49,27 +48,14 @@
                     config,
                     "Backend.AI ES6 App.",
                 );
-
-                let isLogon = await client.check_login();
-                if (isLogon === false) {
-                    client.login().then(response => {
-                        if (response === false) {
-                            if (config._userId != "" && config._password != "") {
-                                console.log("Login information mistmatch. Please check your login information,");
-                            } else if (response.fail_reason) {
-                                if (config._userId != "" && config._password != "") {
-                                    console.log(`Login falied: ${response.fail_reason}.`);
-                                }
-                            } else {
-                                console.log("Login succeeded.");
-                            }
-                        }
-                    }).catch(err => {
-                        console.log(`Login failed: ${err.message}`);
-                    });
-                } else {
-                    console.log("Login already succeeded.");
-                }
+                globalThis.baiclient.ready = false;
+                globalThis.baiclient.get_manager_version().then((response) => {
+                    globalThis.baiclient.ready = true;
+                    return Promise.resolve(true);
+                }).catch((e) =>{
+                    console.log(`Login failed: ${err.message}`);
+                    return Promise.resolve(false);
+                });
             }
 
             export async function execute() {
