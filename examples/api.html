@@ -13,19 +13,19 @@
             <h4>Login</h4>
             <form>
                 API Endpoint: <br/>
-                <input type="text" id="api_endpoint" placeholder="https://cloud.backend.ai" value="https://cloud.backend.ai" /><br/>
-                ID: <br/>
+                <input type="text" id="api_endpoint" placeholder="https://api.cloud.backend.ai" value="https://api.cloud.backend.ai" /><br/>
+                API Key: <br/>
                 <input type="text" id="apikey" autocomplete="username" placeholder="API key"/><br/>
-                PW: <br/>
+                Secret Key: <br/>
                 <input type="password" id="secretkey" autocomplete="current-password" placeholder="Secret Key"/><br/><br/>
                 <input type="button" id="login_button" value="Login" />
             </form>
         </div>
         <div>
-            <h4>DL Code</h4>
+            <h4>Code</h4>
             <textarea id="dl_code" style="height: 300px; width: 500px" placeholder="Write your DL code."></textarea><br/>
             <button id="dl_run">Run</button>
-            <h4>DL Result</h4>
+            <h4>Result</h4>
             <div id="dl_result"></div>
         </div>
         <script type="module">
@@ -48,39 +48,63 @@
                     config,
                     "Backend.AI ES6 App.",
                 );
-                globalThis.baiclient.ready = false;
-                globalThis.baiclient.get_manager_version().then((response) => {
-                    globalThis.baiclient.ready = true;
+                client.ready = false;
+                client.get_manager_version().then((response) => {
+                    client.ready = true;
                     return Promise.resolve(true);
                 }).catch((e) =>{
-                    console.log(`Login failed: ${err.message}`);
+                    console.log(`Login failed: ${e.message}`);
                     return Promise.resolve(false);
                 });
+            }
+
+            export function errorAsString(e) {
+                let result = '';
+                for (let key in e) {
+                    if (e.hasOwnProperty(key)) { 
+                    result = result + " " + key + "," + e[key] + "|";
+                    }
+                }
+                return result;
             }
 
             export async function execute() {
                 if (typeof client === "undefined") {
                     await login();
                 }
-                let version = await client.getManagerVersion();
-                let code = document.querySelector("#dl_code").value;
-                client.createIfNotExists("index.docker.io/lablup/python:3.8-ubuntu18.04", "test", {"cpu": 1, "mem": "1g"}).then(response => {
-                    console.log(`My session is created: ${response.sessionId}`);
-                    return client.execute(response.sessionId, 1, "query", code, {});
-                }).then(response => {
-                    if (response.result.exitCode === 0) {
-                        console.log( response.result.console);
-                        document.querySelector("#dl_result").innerHTML = response.result.console[0][1];
+                try {
+                    //let version = await client.get_manager_version();
+                    let code = document.querySelector("#dl_code").value;
+                    let resources = {"cpu": 1, 
+                        "mem": "1g",
+                        "mounts": [],
+                        "env": {},
+                        "resource_opts": {},
+                        "maxWaitSeconds": 30};
+                    await client.createIfNotExists("cr.backend.ai/cloud/python:3.8-ubuntu18.04", "test", resources);
+
+                    let run_id = Math.floor(Math.random() * 50000).toString();
+                    //globalThis.baiclient.requestTimeout = 15000;
+                    let query = await client.execute("test", run_id, "query", code, {});
+                    while (query.result.status != 'finished') {
+                        query = await client.execute("test", run_id, "query", ``, {});
                     }
-                }).catch(err => {
+                    let response = query;
+                    if (response.result.exitCode === 0) {
+                        document.querySelector("#dl_result").innerHTML = JSON.parse(response.result.console[0][1]);
+                        return JSON.parse(response.result.console[0][1]);
+                    } else {
+                        let result = errorAsString(response.result);
+                        return result;
+                    }
+                } catch (err) {
                     switch (err.type) {
-                        case ai.backend.Client.ERR_SERVER:
+                        case client.ERR_SERVER:
                             console.log(`Session creation failed: ${err.message}`);
-                            break;
                         default:
                             console.log(`request/response failed: ${err.message}`);
                     }
-                });
+                };
             }
         </script>
     </body>
