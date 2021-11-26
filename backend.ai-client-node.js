@@ -193,6 +193,9 @@ class Client {
                 rqst.credentials = 'include';
                 rqst.mode = 'cors';
             }
+            else {
+                rqst.mode = 'cors';
+            }
             if (signal !== null) {
                 rqst.signal = signal;
             }

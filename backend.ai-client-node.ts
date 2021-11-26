@@ -276,6 +276,8 @@ class Client {
       if (this._config.connectionMode === 'SESSION') { // Force request to use Public when session mode is enabled
         rqst.credentials = 'include';
         rqst.mode = 'cors';
+      } else {
+      	rqst.mode = 'cors';
       }
       if (signal !== null) {
         rqst.signal = signal;

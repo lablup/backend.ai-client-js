@@ -13,11 +13,11 @@
             <h4>Login</h4>
             <form>
                 API Endpoint: <br/>
-                <input type="text" id="api_endpoint" placeholder="https://api.cloud.backend.ai" value="https://api.cloud.backend.ai" /><br/>
+                <input type="text" id="api_endpoint" placeholder="https://api.cloud.backend.ai"  /><br/>
                 API Key: <br/>
                 <input type="text" id="apikey" autocomplete="username" placeholder="API key"/><br/>
                 Secret Key: <br/>
-                <input type="password" id="secretkey" autocomplete="current-password" placeholder="Secret Key"/><br/><br/>
+                <input type="password" id="secretkey" autocomplete="current-password" placeholder="Secret Key" /><br/><br/>
                 <input type="button" id="login_button" value="Login" />
             </form>
         </div>
@@ -69,10 +69,10 @@
             }
 
             export async function execute() {
-                if (typeof client === "undefined") {
-                    await login();
-                }
                 try {
+                    if (typeof client === "undefined") {
+                        await login();
+                    }
                     //let version = await client.get_manager_version();
                     let code = document.querySelector("#dl_code").value;
                     let resources = {"cpu": 1, 
@@ -80,6 +80,8 @@
                         "mounts": [],
                         "env": {},
                         "resource_opts": {},
+                        "group_name": "gardener",
+                        "scaling_group": "HPC",
                         "maxWaitSeconds": 30};
                     await client.createIfNotExists("cr.backend.ai/cloud/python:3.8-ubuntu18.04", "test", resources);
 
@@ -91,8 +93,8 @@
                     }
                     let response = query;
                     if (response.result.exitCode === 0) {
-                        document.querySelector("#dl_result").innerHTML = JSON.parse(response.result.console[0][1]);
-                        return JSON.parse(response.result.console[0][1]);
+                        document.querySelector("#dl_result").innerHTML = response.result.console[0][1];
+                        return response.result.console[0][1];
                     } else {
                         let result = errorAsString(response.result);
                         return result;
