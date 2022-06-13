@@ -15,7 +15,7 @@ $ npm install backend.ai-client
 You can also use `yarn`.
 
 ```console
-$ yarn install backend.ai-client
+$ yarn add backend.ai-client
 ```
 
 ## Build
