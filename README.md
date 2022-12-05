@@ -63,7 +63,7 @@ let client = new ai.backend.Client(config);
 ```
 
 ES6+:
-```
+```javascript
 import './backend.ai-client-es6.js';
 
 let config = new ai.backend.ClientConfig(
