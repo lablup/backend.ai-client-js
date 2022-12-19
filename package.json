@@ -2,7 +2,7 @@
   "name": "backend.ai-client",
   "version": "21.9.0",
   "description": "Backend.AI Client for javascript",
-  "main": "backend.ai-client.js",
+  "main": "backend.ai-client-node.js",
   "scripts": {
     "test": "",
     "build-doc": "./node_modules/jsdoc/jsdoc.js -c ./jsdoc.json",
