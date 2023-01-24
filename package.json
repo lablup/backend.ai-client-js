@@ -2,10 +2,12 @@
   "name": "backend.ai-client",
   "version": "21.9.0",
   "description": "Backend.AI Client for javascript",
-  "main": "backend.ai-client.js",
+  "main": "backend.ai-client-node.js",
   "scripts": {
     "test": "",
-    "build-doc": "./node_modules/jsdoc/jsdoc.js -c ./jsdoc.json"
+    "build-doc": "./node_modules/jsdoc/jsdoc.js -c ./jsdoc.json",
+    "build": "npx -p typescript tsc backend.ai-client-node.ts --target es2017",
+    "declare": "npx -p typescript tsc backend.ai-client-node.js --allowJs --target es2017 --declaration --emitDeclarationOnly --outDir lib"
   },
   "repository": {
     "type": "git",
@@ -37,5 +39,6 @@
     "node-fetch": "^2.6.1",
     "tinyify": "^3.0.0",
     "typescript": "^4.4.2"
-  }
+  },
+  "types": "./lib/backend.ai-client-node.d.ts"
 }
