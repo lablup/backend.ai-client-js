@@ -1,60 +1,28 @@
-declare const crypto_node: any;
-declare const querystring: any;
-interface Window {
-    backendaiclient: any;
+export namespace backend {
+    export { Client };
+    export { ClientConfig };
 }
-declare class ClientConfig {
-    _apiVersionMajor: string;
-    _apiVersion: string;
-    _hashType: string;
-    _endpoint: string;
-    _endpointHost: string;
-    _accessKey: string;
-    _secretKey: string;
-    _userId: string;
-    _password: string;
-    _proxyURL: any;
-    _proxyToken: any;
-    _connectionMode: string;
+export class Client {
     /**
-     * The client Configuration object.
+     * The client API wrapper.
      *
-     * @param {string} accessKey - access key to connect Backend.AI manager
-     * @param {string} secretKey - secret key to connect Backend.AI manager
-     * @param {string} endpoint  - endpoint of Backend.AI manager
-     * @param {string} connectionMode - connection mode. 'API', 'SESSION' is supported. `SESSION` mode requires webserver.
+     * @param {ClientConfig} config - the API client-side configuration
+     * @param {string} agentSignature - an extra string that will be appended to User-Agent headers when making API requests
      */
-    constructor(accessKey: any, secretKey: any, endpoint: any, connectionMode?: string);
-    get accessKey(): string;
-    get secretKey(): string;
-    get userId(): string;
-    get password(): string;
-    get endpoint(): string;
-    get proxyURL(): any;
-    get proxyToken(): any;
-    get endpointHost(): string;
-    get apiVersion(): string;
-    get apiVersionMajor(): string;
-    get hashType(): string;
-    get connectionMode(): string;
-    /**
-     * Create a ClientConfig object from environment variables.
-     */
-    static createFromEnv(): ClientConfig;
-}
-declare class Client {
+    constructor(config: ClientConfig, agentSignature: string);
+    ready: boolean;
     code: any;
-    sessionId: string | null;
+    sessionId: any;
     kernelType: any;
     clientVersion: string;
-    agentSignature: any;
-    _config: any;
+    agentSignature: string;
+    _config: ClientConfig;
     _managerVersion: any;
     _apiVersion: any;
     _apiVersionMajor: any;
     is_admin: boolean;
     is_superadmin: boolean;
-    kernelPrefix: any;
+    kernelPrefix: string;
     resourcePreset: ResourcePreset;
     vfolder: VFolder;
     agent: Agent;
@@ -74,28 +42,14 @@ declare class Client {
     registry: Registry;
     setting: Setting;
     userConfig: UserConfig;
-    cloud: Cloud;
-    eduApp: EduApp;
     service: Service;
     enterprise: Enterprise;
-    _features: any;
-    ready: boolean;
-    abortController: any;
-    abortSignal: any;
+    cloud: Cloud;
+    eduApp: EduApp;
+    _features: {};
+    abortController: AbortController;
+    abortSignal: AbortSignal;
     requestTimeout: number;
-    static ERR_REQUEST: any;
-    static ERR_RESPONSE: any;
-    static ERR_ABORT: any;
-    static ERR_TIMEOUT: any;
-    static ERR_SERVER: any;
-    static ERR_UNKNOWN: any;
-    /**
-     * The client API wrapper.
-     *
-     * @param {ClientConfig} config - the API client-side configuration
-     * @param {string} agentSignature - an extra string that will be appended to User-Agent headers when making API requests
-     */
-    constructor(config: any, agentSignature: any);
     /**
      * Return the server-side manager version.
      */
@@ -114,7 +68,7 @@ declare class Client {
      * @param {number} retry - an integer to retry this request
      * @param {Object} opts - Options
      */
-    _wrapWithPromise(rqst: any, rawFile?: boolean, signal?: any, timeout?: number, retry?: number, opts?: {}): any;
+    _wrapWithPromise(rqst: Request, rawFile?: boolean, signal?: any, timeout?: number, retry?: number, opts?: any): any;
     /**
      * Return the server-side API version.
      *
@@ -123,13 +77,13 @@ declare class Client {
      */
     getServerVersion(signal?: any): any;
     /**
+     * Force API major version
+     */
+    set APIMajorVersion(arg: any);
+    /**
      * Get API major version
      */
     get APIMajorVersion(): any;
-    /**
-     * Force API major version
-     */
-    set APIMajorVersion(value: any);
     /**
      * Get the server-side manager version.
      *
@@ -197,19 +151,19 @@ declare class Client {
      * @param {object} resources - Per-session resource
      * @param {number} timeout - Timeout of request. Default : default fetch value. (5sec.)
      */
-    createIfNotExists(kernelType: any, sessionId: any, resources?: {}, timeout?: number): Promise<any>;
+    createIfNotExists(kernelType: string, sessionId: string, resources?: object, timeout?: number): Promise<any>;
     /**
      * Create a session with a session template.
      *
      * @param {string} sessionId - the sessionId given when created
      */
-    createSessionFromTemplate(templateId: any, image?: any, sessionName?: undefined | string | null, resources?: {}, timeout?: number): Promise<any>;
+    createSessionFromTemplate(templateId: any, image?: any, sessionName?: any, resources?: {}, timeout?: number): Promise<any>;
     /**
      * Obtain the session information by given sessionId.
      *
      * @param {string} sessionId - the sessionId given when created
      */
-    get_info(sessionId: any, ownerKey?: any): Promise<any>;
+    get_info(sessionId: string, ownerKey?: any): Promise<any>;
     /**
      * Obtain the session container logs by given sessionId.
      *
@@ -217,13 +171,13 @@ declare class Client {
      * @param {string | null} ownerKey - owner key to access
      * @param {number} timeout - timeout to wait log query. Set to 0 to use default value.
      */
-    get_logs(sessionId: any, ownerKey?: any, timeout?: number): Promise<any>;
+    get_logs(sessionId: string, ownerKey?: string | null, timeout?: number): Promise<any>;
     /**
      * Obtain the batch session (task) logs by given sessionId.
      *
      * @param {string} sessionId - the sessionId given when created
      */
-    getTaskLogs(sessionId: any): any;
+    getTaskLogs(sessionId: string): any;
     /**
      * Terminate and destroy the kernel session.
      *
@@ -231,13 +185,13 @@ declare class Client {
      * @param {string|null} ownerKey - owner key when terminating other users' session
      * @param {boolean} forced - force destroy session. Requires admin privilege.
      */
-    destroy(sessionId: any, ownerKey?: any, forced?: boolean): Promise<any>;
+    destroy(sessionId: string, ownerKey?: string | null, forced?: boolean): Promise<any>;
     /**
      * Restart the kernel session keeping its work directory and volume mounts.
      *
      * @param {string} sessionId - the sessionId given when created
      */
-    restart(sessionId: any, ownerKey?: any): Promise<any>;
+    restart(sessionId: string, ownerKey?: any): Promise<any>;
     /**
      * Execute a code snippet or schedule batch-mode executions.
      *
@@ -246,7 +200,7 @@ declare class Client {
      * @param {string} mode - either "query", "batch", "input", or "continue"
      * @param {string} opts - an optional object specifying additional configs such as batch-mode build/exec commands
      */
-    execute(sessionId: any, runId: any, mode: any, code: any, opts: any, timeout?: number): Promise<any>;
+    execute(sessionId: string, runId: string, mode: string, code: any, opts: string, timeout?: number): Promise<any>;
     createKernel(kernelType: any, sessionId?: any, resources?: {}, timeout?: number): Promise<any>;
     destroyKernel(sessionId: any, ownerKey?: any): Promise<any>;
     refreshKernel(sessionId: any, ownerKey?: any): Promise<any>;
@@ -264,7 +218,7 @@ declare class Client {
      * @param {number} timeout - Timeout to force terminate request
      * @param {number} retry - The number of retry when request is failed
      */
-    query(q: any, v: any, signal?: any, timeout?: number, retry?: number): Promise<any>;
+    query(q: string, v: string, signal?: any, timeout?: number, retry?: number): Promise<any>;
     /**
      * Generate a RequestInfo object that can be passed to fetch() API,
      * which includes a properly signed header with the configured auth information.
@@ -273,12 +227,12 @@ declare class Client {
      * @param {string} queryString - the URI path and GET parameters
      * @param {any} body - an object that will be encoded as JSON in the request body
      */
-    newSignedRequest(method: string, queryString: any, body: any): {
+    newSignedRequest(method: string, queryString: string, body: any): {
         method: string;
-        headers: any;
+        headers: Headers;
         cache: string;
         body: any;
-        uri: any;
+        uri: string;
     };
     /**
      * Same to newRequest() method but it does not sign the request.
@@ -288,7 +242,7 @@ declare class Client {
      * @param {string} queryString - the URI path and GET parameters
      * @param {any} body - an object that will be encoded as JSON in the request body
      */
-    newUnsignedRequest(method: any, queryString: any, body: any): {
+    newUnsignedRequest(method: string, queryString: string, body: any): {
         method: any;
         headers: Headers;
         mode: string;
@@ -304,8 +258,8 @@ declare class Client {
     };
     getAuthenticationString(method: any, queryString: any, dateValue: any, bodyValue: any, content_type?: string): string;
     getCurrentDate(now: any): string;
-    sign(key: any, key_encoding: any, msg: any, digest_type: any): any;
-    getSignKey(secret_key: any, now: any): any;
+    sign(key: any, key_encoding: any, msg: any, digest_type: any): string;
+    getSignKey(secret_key: any, now: any): string;
     generateSessionId(length?: number, nosuffix?: boolean): string;
     slugify(text: any): any;
     /**
@@ -319,15 +273,62 @@ declare class Client {
      */
     refreshSSHKeypair(): Promise<any>;
 }
+export namespace Client {
+    const ERR_SERVER: number;
+    const ERR_RESPONSE: number;
+    const ERR_REQUEST: number;
+    const ERR_ABORT: number;
+    const ERR_TIMEOUT: number;
+    const ERR_UNKNOWN: number;
+}
+export class ClientConfig {
+    /**
+     * Create a ClientConfig object from environment variables.
+     */
+    static createFromEnv(): ClientConfig;
+    /**
+     * The client Configuration object.
+     *
+     * @param {string} accessKey - access key to connect Backend.AI manager
+     * @param {string} secretKey - secret key to connect Backend.AI manager
+     * @param {string} endpoint  - endpoint of Backend.AI manager
+     * @param {string} connectionMode - connection mode. 'API', 'SESSION' is supported. `SESSION` mode requires webserver.
+     */
+    constructor(accessKey: string, secretKey: string, endpoint: string, connectionMode?: string);
+    _apiVersionMajor: string;
+    _apiVersion: string;
+    _hashType: string;
+    _endpoint: string;
+    _endpointHost: string;
+    _accessKey: string;
+    _secretKey: string;
+    _userId: string;
+    _password: string;
+    _proxyURL: any;
+    _proxyToken: any;
+    _connectionMode: string;
+    get accessKey(): string;
+    get secretKey(): string;
+    get userId(): string;
+    get password(): string;
+    get endpoint(): string;
+    get proxyURL(): any;
+    get proxyToken(): any;
+    get endpointHost(): string;
+    get apiVersion(): string;
+    get apiVersionMajor(): string;
+    get hashType(): string;
+    get connectionMode(): string;
+}
 declare class ResourcePreset {
-    client: any;
-    urlPrefix: any;
     /**
      * Resource Preset API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any);
+    constructor(client: Client);
+    client: Client;
+    urlPrefix: string;
     /**
      * Return the GraphQL Promise object containing resource preset list.
      */
@@ -345,7 +346,7 @@ declare class ResourcePreset {
      *   'resource_slots': JSON.stringify(total_resource_slots), // Resource slot value. should be Stringified JSON.
      * };
      */
-    add(name: any, input: any): Promise<any>;
+    add(name: string, input: any): Promise<any>;
     /**
      * mutate specified resource preset with given name with new values.
      *
@@ -355,25 +356,25 @@ declare class ResourcePreset {
      *   'resource_slots': JSON.stringify(total_resource_slots), // Resource slot value. should be Stringified JSON.
      * };
      */
-    mutate(name: any, input: any): Promise<any>;
+    mutate(name: string, input: any): Promise<any>;
     /**
      * delete specified resource preset with given name.
      *
      * @param {string} name - resource preset name to delete.
      */
-    delete(name?: any): Promise<any>;
+    delete(name?: string): Promise<any>;
 }
 declare class VFolder {
-    client: any;
-    name: any;
-    urlPrefix: any;
     /**
      * The Virtual Folder API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      * @param {string} name - Virtual folder name.
      */
-    constructor(client: any, name?: any);
+    constructor(client: Client, name?: string);
+    client: Client;
+    name: string;
+    urlPrefix: string;
     /**
      * Get allowed types of folders
      *
@@ -389,7 +390,7 @@ declare class VFolder {
      * @param {string} permission - Virtual folder's innate permission.
      * @param {boolean} cloneable - Whether Virtual folder is cloneable or not.
      */
-    create(name: any, host?: string, group?: string, usageMode?: string, permission?: string, cloneable?: boolean): Promise<any>;
+    create(name: string, host?: string, group?: string, usageMode?: string, permission?: string, cloneable?: boolean): Promise<any>;
     /**
      * Clone selected Virtual folder
      *
@@ -427,19 +428,19 @@ declare class VFolder {
      *
      * @param {string} new_name - New virtual folder name.
      */
-    rename(new_name?: any): Promise<any>;
+    rename(new_name?: string): Promise<any>;
     /**
      * Delete a Virtual folder.
      *
      * @param {string} name - Virtual folder name. If no name is given, use name on this VFolder object.
      */
-    delete(name?: any): Promise<any>;
+    delete(name?: string): Promise<any>;
     /**
      * Leave an invited Virtual folder.
      *
      * @param {string} name - Virtual folder name. If no name is given, use name on this VFolder object.
      */
-    leave_invited(name?: any): Promise<any>;
+    leave_invited(name?: string): Promise<any>;
     /**
      * Upload files to specific Virtual folder.
      *
@@ -447,14 +448,14 @@ declare class VFolder {
      * @param {string} fs - File content to upload.
      * @param {string} name - Virtual folder name.
      */
-    upload(path: any, fs: any, name?: any): Promise<any>;
+    upload(path: string, fs: string, name?: string): Promise<any>;
     /**
      * Upload file from formData to specific Virtual folder.
      *
      * @param {string} fss - formData with file specification. formData should contain {src, content, {filePath:filePath}}.
      * @param {string} name - Virtual folder name.
      */
-    uploadFormData(fss: any, name?: any): Promise<any>;
+    uploadFormData(fss: string, name?: string): Promise<any>;
     /**
      * Create a upload session for a file to Virtual folder.
      *
@@ -462,7 +463,7 @@ declare class VFolder {
      * @param {string} fs - File object to upload.
      * @param {string} name - Virtual folder name.
      */
-    create_upload_session(path: any, fs: any, name?: any): Promise<any>;
+    create_upload_session(path: string, fs: string, name?: string): Promise<string>;
     /**
      * Create directory in specific Virtual folder.
      *
@@ -471,7 +472,7 @@ declare class VFolder {
      * @param {string} parents - create parent folders when not exists (>=APIv6).
      * @param {string} exist_ok - Do not raise error when the folder already exists (>=APIv6).
      */
-    mkdir(path: any, name?: any, parents?: any, exist_ok?: any): Promise<any>;
+    mkdir(path: string, name?: string, parents?: string, exist_ok?: string): Promise<any>;
     /**
      * Rename a file inside a virtual folder.
      *
@@ -480,7 +481,7 @@ declare class VFolder {
      * @param {string} name - Virtual folder name that target file exists.
      * @param {string} is_dir - True when the object is directory, false when it is file
      */
-    rename_file(target_path: any, new_name: any, name?: any, is_dir?: boolean): Promise<any>;
+    rename_file(target_path: string, new_name: string, name?: string, is_dir?: string): Promise<any>;
     /**
      * Delete multiple files in a Virtual folder.
      *
@@ -488,7 +489,7 @@ declare class VFolder {
      * @param {boolean} recursive - delete files recursively.
      * @param {string} name - Virtual folder name that files are in.
      */
-    delete_files(files: any, recursive?: boolean, name?: any): Promise<any>;
+    delete_files(files: string, recursive?: boolean, name?: string): Promise<any>;
     /**
      * Download file from a Virtual folder.
      *
@@ -497,7 +498,7 @@ declare class VFolder {
      * @param {boolean} archive - Download target directory as an archive.
      * @param {boolean} noCache - If true, do not store the file response in any cache. New in API v6.
      */
-    download(file: any, name?: boolean, archive?: boolean, noCache?: boolean): Promise<any>;
+    download(file: string, name?: string, archive?: boolean, noCache?: boolean): Promise<any>;
     /**
      * Request a download and get the token for direct download.
      *
@@ -505,7 +506,7 @@ declare class VFolder {
      * @param {string} name - Virtual folder name that files are in.
      * @param {boolean} archive - Download target directory as an archive.
      */
-    request_download_token(file: any, name?: boolean, archive?: boolean): Promise<any>;
+    request_download_token(file: string, name?: string, archive?: boolean): Promise<any>;
     /**
      * Download file in a Virtual folder with token.
      *
@@ -524,7 +525,7 @@ declare class VFolder {
      * @param {string} path - Directory path to list.
      * @param {string} name - Virtual folder name to look up with.
      */
-    list_files(path: any, name?: any): Promise<any>;
+    list_files(path: string, name?: string): Promise<any>;
     /**
      * Invite someone to specific virtual folder with permission.
      *
@@ -532,7 +533,7 @@ declare class VFolder {
      * @param {array} emails - User E-mail to invite.
      * @param {string} name - Virtual folder name to invite.
      */
-    invite(perm: any, emails: any, name?: any): Promise<any>;
+    invite(perm: string, emails: any[], name?: string): Promise<any>;
     /**
      * Show invitations to current API key.
      */
@@ -542,19 +543,19 @@ declare class VFolder {
      *
      * @param {string} inv_id - Invitation ID.
      */
-    accept_invitation(inv_id: any): Promise<any>;
+    accept_invitation(inv_id: string): Promise<any>;
     /**
      * Delete specific invitation.
      *
      * @param {string} inv_id - Invitation ID to delete.
      */
-    delete_invitation(inv_id: any): Promise<any>;
+    delete_invitation(inv_id: string): Promise<any>;
     /**
      * List invitees(users who accepted an invitation)
      *
      * @param {string} vfolder_id - vfolder id. If no id is given, all users who accepted the client's invitation will be returned
      */
-    list_invitees(vfolder_id?: any): Promise<any>;
+    list_invitees(vfolder_id?: string): Promise<any>;
     /**
      * Modify an invitee's permission to a shared vfolder
      *
@@ -571,14 +572,14 @@ declare class VFolder {
      * @param {array} emails - User E-mail(s) to share.
      * @param {string} name - A group virtual folder name to share.
      */
-    share(permission: any, emails: any, name?: any): Promise<any>;
+    share(permission: any, emails: any[], name?: string): Promise<any>;
     /**
      * Unshare a group-type virtual folder from given users.
      *
      * @param {array} emails - User E-mail(s) to unshare.
      * @param {string} name - A group virtual folder name to unshare.
      */
-    unshare(emails: any, name?: any): Promise<any>;
+    unshare(emails: any[], name?: string): Promise<any>;
     /**
      * Get the size quota of a vfolder.
      * Only available for some specific file system such as XFS.
@@ -586,7 +587,7 @@ declare class VFolder {
      * @param {string} host - Host name of a virtual folder.
      * @param {string} vfolder_id - id of the vfolder.
      */
-    get_quota(host: any, vfolder_id: any): Promise<any>;
+    get_quota(host: string, vfolder_id: string): Promise<any>;
     /**
      * Set the size quota of a vfolder.
      * Only available for some specific file system such as XFS.
@@ -595,16 +596,16 @@ declare class VFolder {
      * @param {string} vfolder_id - id of the vfolder.
      * @param {number} quota - quota size of the vfolder.
      */
-    set_quota(host: any, vfolder_id: any, quota: any): Promise<any>;
+    set_quota(host: string, vfolder_id: string, quota: number): Promise<any>;
 }
 declare class Agent {
-    client: any;
     /**
      * Agent API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any);
+    constructor(client: Client);
+    client: Client;
     /**
      * List computation agents.
      *
@@ -612,41 +613,17 @@ declare class Agent {
      * @param {array} fields - Fields to query. Queryable fields are:  'id', 'status', 'region', 'first_contact', 'cpu_cur_pct', 'mem_cur_bytes', 'available_slots', 'occupied_slots'.
      * @param {number} timeout - timeout for the request. Default uses SDK default. (5 sec.)
      */
-    list(status?: string, fields?: string[], timeout?: number): Promise<any>;
-}
-declare class StorageProxy {
-    client: any;
-    /**
-     * Agent API wrapper.
-     *
-     * @param {Client} client - the Client API wrapper object to bind
-     */
-    constructor(client: any);
-    /**
-     * List storage proxies and its volumes.
-     *
-     * @param {array} fields - Fields to query. Queryable fields are:  'id', 'backend', 'capabilities'.
-     * @param {number} limit - limit number of query items.
-     * @param {number} offset - offset for item query. Useful for pagination.
-     */
-    list(fields?: string[], limit?: number, offset?: number): Promise<any>;
-    /**
-     * Detail of specific storage proxy / volume.
-     *
-     * @param {string} host - Virtual folder host.
-     * @param {array} fields - Fields to query. Queryable fields are:  'id', 'backend', 'capabilities'.
-     */
-    detail(host?: string, fields?: string[]): Promise<any>;
+    list(status?: string, fields?: any[], timeout?: number): Promise<any>;
 }
 declare class Keypair {
-    client: any;
-    name: any;
     /**
      * Keypair API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any, name?: any);
+    constructor(client: Client, name?: any);
+    client: Client;
+    name: any;
     /**
      * Information of specific Keypair.
      *
@@ -654,7 +631,7 @@ declare class Keypair {
      * @param {array} fields - Fields to query. Queryable fields are: 'access_key', 'secret_key', 'is_active', 'is_admin', 'user_id', 'created_at', 'last_used',
      'concurrency_limit', 'concurrency_used', 'rate_limit', 'num_queries', 'resource_policy'.
      */
-    info(accessKey: any, fields?: string[]): Promise<any>;
+    info(accessKey: string, fields?: any[]): Promise<any>;
     /**
      * List all Keypairs of given user ID.
      *
@@ -662,7 +639,7 @@ declare class Keypair {
      * @param {array} fields - Fields to query. Queryable fields are: "access_key", 'is_active', 'is_admin', 'user_id', 'created_at', 'last_used',
      'concurrency_used', 'rate_limit', 'num_queries', 'resource_policy'.
      */
-    list(userId?: any, fields?: string[], isActive?: boolean): Promise<any>;
+    list(userId?: string, fields?: any[], isActive?: boolean): Promise<any>;
     /**
      * Add Keypair with given information.
      *
@@ -672,7 +649,7 @@ declare class Keypair {
      * @param {string} resourcePolicy - resource policy name to assign. Default is `default`.
      * @param {integer} rateLimit - API rate limit for 900 seconds. Prevents from DDoS attack.
      */
-    add(userId?: any, isActive?: boolean, isAdmin?: boolean, resourcePolicy?: string, rateLimit?: number): Promise<any>;
+    add(userId?: string, isActive?: boolean, isAdmin?: boolean, resourcePolicy?: string, rateLimit?: any): Promise<any>;
     /**
      * mutate Keypair for given accessKey.
      *
@@ -685,78 +662,22 @@ declare class Keypair {
      *   'rate_limit': rate_limit
      * }
      */
-    mutate(accessKey: any, input: any): Promise<any>;
+    mutate(accessKey: string, input: any): Promise<any>;
     /**
      * Delete Keypair with given accessKey
      *
      * @param {string} accessKey - access key to delete.
      */
-    delete(accessKey: any): Promise<any>;
-}
-declare class ResourcePolicy {
-    client: any;
-    /**
-     * The Resource Policy  API wrapper.
-     *
-     * @param {Client} client - the Client API wrapper object to bind
-     */
-    constructor(client: any);
-    /**
-     * get resource policy with given name and fields.
-     *
-     * @param {string} name - resource policy name.
-     * @param {array} fields - fields to query.
-     */
-    get(name?: any, fields?: string[]): Promise<any>;
-    /**
-     * add resource policy with given name and fields.
-     *
-     * @param {string} name - resource policy name.
-     * @param {json} input - resource policy specification and data. Required fields are:
-     * {
-     *   'default_for_unspecified': 'UNLIMITED', // default resource policy when resource slot is not given. 'UNLIMITED' or 'LIMITED'.
-     *   'total_resource_slots': JSON.stringify(total_resource_slots), // Resource slot value. should be Stringified JSON.
-     *   'max_concurrent_sessions': concurrency_limit,
-     *   'max_containers_per_session': containers_per_session_limit,
-     *   'idle_timeout': idle_timeout,
-     *   'max_vfolder_count': vfolder_count_limit,
-     *   'max_vfolder_size': vfolder_capacity_limit,
-     *   'allowed_vfolder_hosts': vfolder_hosts
-     * };
-     */
-    add(name: any, input: any): Promise<any>;
-    /**
-     * mutate specified resource policy with given name with new values.
-     *
-     * @param {string} name - resource policy name to mutate. (READ-ONLY)
-     * @param {json} input - resource policy specification and data. Required fields are:
-     * {
-     *   {string} 'default_for_unspecified': 'UNLIMITED', // default resource policy when resource slot is not given. 'UNLIMITED' or 'LIMITED'.
-     *   {JSONString} 'total_resource_slots': JSON.stringify(total_resource_slots), // Resource slot value. should be Stringified JSON.
-     *   {int} 'max_concurrent_sessions': concurrency_limit,
-     *   {int} 'max_containers_per_session': containers_per_session_limit,
-     *   {bigint} 'idle_timeout': idle_timeout,
-     *   {int} 'max_vfolder_count': vfolder_count_limit,
-     *   {bigint} 'max_vfolder_size': vfolder_capacity_limit,
-     *   {[string]} 'allowed_vfolder_hosts': vfolder_hosts
-     * };
-     */
-    mutate(name: any, input: any): Promise<any>;
-    /**
-     * delete specified resource policy that exists in policy list.
-     *
-     * @param {string} name - resource policy name to delete. (READ-ONLY)
-     */
-    delete(name?: any): Promise<any>;
+    delete(accessKey: string): Promise<any>;
 }
 declare class ContainerImage {
-    client: any;
     /**
      * The Container image API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any);
+    constructor(client: Client);
+    client: Client;
     /**
      * list container images registered on the manager.
      *
@@ -764,7 +685,7 @@ declare class ContainerImage {
      * @param {boolean} installed_only - filter images to installed / not installed. true to query installed images only.
      * @param {boolean} system_images - filter images to get system images such as web UI, SFTP server. true to query system images only.
      */
-    list(fields?: string[], installed_only?: boolean, system_images?: boolean): Promise<any>;
+    list(fields?: any[], installed_only?: boolean, system_images?: boolean): Promise<any>;
     /**
      * Modify resource of given image.
      *
@@ -773,7 +694,7 @@ declare class ContainerImage {
      * @param {string} tag - image tag.
      * @param {object} input - value list to set.
      */
-    modifyResource(registry: any, image: any, tag: any, input: any): Promise<any[]>;
+    modifyResource(registry: string, image: string, tag: string, input: object): Promise<any[]>;
     /**
      * Modify label of given image.
      *
@@ -783,7 +704,7 @@ declare class ContainerImage {
      * @param {string} key - key to change.
      * @param {string} value - value for the key.
      */
-    modifyLabel(registry: any, image: any, tag: any, key: any, value: any): Promise<any>;
+    modifyLabel(registry: string, image: string, tag: string, key: string, value: string): Promise<any>;
     /**
      * install specific container images from registry
      *
@@ -791,14 +712,14 @@ declare class ContainerImage {
      * @param {object} resource - resource to use for installation.
      * @param {string} registry - registry of image. default is 'index.docker.io', which is public Backend.AI docker registry.
      */
-    install(name: any, resource?: object, registry?: string): Promise<any>;
+    install(name: string, resource?: object, registry?: string): Promise<any>;
     /**
      * uninstall specific container images from registry (TO BE IMPLEMENTED)
      *
      * @param {string} name - name to install. it should contain full path with tags. e.g. lablup/python:3.6-ubuntu18.04
      * @param {string} registry - registry of image. default is 'index.docker.io', which is public Backend.AI docker registry.
      */
-    uninstall(name: any, registry?: string): Promise<boolean>;
+    uninstall(name: string, registry?: string): Promise<boolean>;
     /**
      * Get image label information.
      *
@@ -806,16 +727,33 @@ declare class ContainerImage {
      * @param {string} image - image name.
      * @param {string} tag - tag to get.
      */
-    get(registry: any, image: any, tag: any): Promise<any>;
+    get(registry: string, image: string, tag: string): Promise<any>;
+}
+declare class utils {
+    constructor(client: any);
+    client: any;
+    changeBinaryUnit(value: any, targetUnit?: string, defaultUnit?: string): any;
+    elapsedTime(start: any, end: any): string;
+    _padding_zeros(n: any, width: any): any;
+    /**
+     * Limit the boundary of value
+     *
+     * @param {number} value - input value to be clamped
+     * @param {number} min - minimum value of the input value
+     * @param {number} max - maximum value of the input vallue
+     */
+    clamp(value: number, min: number, max: number): number;
+    gqlToObject(array: any, key: any): {};
+    gqlToList(array: any, key: any): any[];
 }
 declare class ComputeSession {
-    client: any;
     /**
      * The Computate session API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any);
+    constructor(client: Client);
+    client: Client;
     /**
      * Get the number of compute sessions with specific conditions.
      *
@@ -839,7 +777,7 @@ declare class ComputeSession {
      * @param {string} group - project group id to query. Default returns sessions from all groups.
      * @param {number} timeout - timeout for the request. Default uses SDK default. (5 sec.)
      */
-    list(fields?: string[], status?: string, accessKey?: string, limit?: number, offset?: number, group?: string, timeout?: number): Promise<any>;
+    list(fields?: any[], status?: string, accessKey?: string, limit?: number, offset?: number, group?: string, timeout?: number): Promise<any>;
     /**
      * list all status of compute sessions.
      *
@@ -851,25 +789,25 @@ declare class ComputeSession {
      * @param {string} group - project group id to query. Default returns sessions from all groups.
      * @param {number} timeout - timeout for the request. Default uses SDK default. (5 sec.)
      */
-    listAll(fields?: string[], status?: string, accessKey?: string, limit?: number, offset?: number, group?: string, timeout?: number): Promise<any>;
+    listAll(fields?: any[], status?: string, accessKey?: string, limit?: number, offset?: number, group?: string, timeout?: number): Promise<any[]>;
     /**
      * get compute session with specific condition.
      *
      * @param {array} fields - fields to query. Default fields are: ["session_name", "lang", "created_at", "terminated_at", "status", "status_info", "occupied_slots", "cpu_used", "io_read_bytes", "io_write_bytes"].
      * @param {string} sessionUuid - session ID to query specific compute session.
      */
-    get(fields?: string[], sessionUuid?: string): Promise<any>;
-    startService(session: string, app: string, port?: number | null, envs?: Record<string, unknown> | null, args?: Record<string, unknown> | null): Promise<any>;
+    get(fields?: any[], sessionUuid?: string): Promise<any>;
+    startService(session: any, app: any, port?: any, envs?: any, args?: any): Promise<any>;
 }
 declare class SessionTemplate {
-    client: any;
-    urlPrefix: string;
     /**
      * The Computate session template API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any);
+    constructor(client: Client);
+    client: Client;
+    urlPrefix: string;
     /**
      * list session templates with specific conditions.
      *
@@ -884,125 +822,70 @@ declare class SessionTemplate {
      */
     list(listall?: boolean, groupId?: any): Promise<any>;
 }
-declare class Resources {
-    client: any;
-    resources: any;
-    agents: any;
-    constructor(client: any);
-    _init_resource_values(): void;
+declare class ResourcePolicy {
     /**
-     * Total resource information of Backend.AI cluster.
-     *
-     * @param {string} status - Resource node status to get information.
-     */
-    totalResourceInformation(status?: string): Promise<any>;
-    /**
-     * user statistics about usage.
-     *
-     */
-    user_stats(): Promise<any>;
-}
-declare class Group {
-    client: any;
-    /**
-     * The group API wrapper.
+     * The Resource Policy  API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any);
+    constructor(client: Client);
+    client: Client;
     /**
-     * List registred groups.
-     * @param {boolean} is_active - List whether active users or inactive users.
-     * @param {string} domain_name - domain name of group
-     * {
-     *   'name': String,          // Group name.
-     *   'description': String,   // Description for group.
-     *   'is_active': Boolean,    // Whether the group is active or not.
-     *   'created_at': String,    // Created date of group.
-     *   'modified_at': String,   // Modified date of group.
-     *   'domain_name': String,   // Domain for group.
-     * };
-     */
-    list(is_active?: boolean, domain_name?: boolean, fields?: string[]): Promise<any>;
-}
-declare class Domain {
-    client: any;
-    /**
-     * The domain API wrapper.
+     * get resource policy with given name and fields.
      *
-     * @param {Client} client - the Client API wrapper object to bind
+     * @param {string} name - resource policy name.
+     * @param {array} fields - fields to query.
      */
-    constructor(client: any);
+    get(name?: string, fields?: any[]): Promise<any>;
     /**
-     * Get domain information.
-     * @param {string} domain_name - domain name of group
-     * @param {array} fields - fields to query.  Default fields are: ['name', 'description', 'is_active', 'created_at', 'modified_at', 'total_resource_slots', 'allowed_vfolder_hosts',
-     'allowed_docker_registries', 'integration_id', 'scaling_groups']
-     * {
-     *   'name': String,          // Group name.
-     *   'description': String,   // Description for group.
-     *   'is_active': Boolean,    // Whether the group is active or not.
-     *   'created_at': String,    // Created date of group.
-     *   'modified_at': String,   // Modified date of group.
-     *   'total_resource_slots': JSOONString,   // Total resource slots
-     *   'allowed_vfolder_hosts': [String],   // Allowed virtual folder hosts
-     *   'allowed_docker_registries': [String],   // Allowed docker registry lists
-     *   'integration_id': [String],   // Integration ids
-     *   'scaling_groups': [String],   // Scaling groups
-     * };
-     */
-    get(domain_name?: boolean, fields?: string[]): Promise<any>;
-    list(fields?: string[]): Promise<any>;
-    /**
-     * Modify domain information.
-     * @param {string} domain_name - domain name of group
-  
-  
-     * @param {json} input - Domain specification to change. Required fields are:
-     * {
-     *   'name': String,          // Group name.
-     *   'description': String,   // Description for group.
-     *   'is_active': Boolean,    // Whether the group is active or not.
-     *   'created_at': String,    // Created date of group.
-     *   'modified_at': String,   // Modified date of group.
-     *   'total_resource_slots': JSOONString,   // Total resource slots
-     *   'allowed_vfolder_hosts': [String],   // Allowed virtual folder hosts
-     *   'allowed_docker_registries': [String],   // Allowed docker registry lists
-     *   'integration_id': [String],   // Integration ids
-     *   'scaling_groups': [String],   // Scaling groups
-     * };
-     */
-    update(domain_name: boolean, input: any): Promise<any>;
-}
-declare class Maintenance {
-    client: any;
-    urlPrefix: any;
-    /**
-     * The Maintenance API wrapper.
+     * add resource policy with given name and fields.
      *
-     * @param {Client} client - the Client API wrapper object to bind
+     * @param {string} name - resource policy name.
+     * @param {json} input - resource policy specification and data. Required fields are:
+     * {
+     *   'default_for_unspecified': 'UNLIMITED', // default resource policy when resource slot is not given. 'UNLIMITED' or 'LIMITED'.
+     *   'total_resource_slots': JSON.stringify(total_resource_slots), // Resource slot value. should be Stringified JSON.
+     *   'max_concurrent_sessions': concurrency_limit,
+     *   'max_containers_per_session': containers_per_session_limit,
+     *   'idle_timeout': idle_timeout,
+     *   'max_vfolder_count': vfolder_count_limit,
+     *   'max_vfolder_size': vfolder_capacity_limit,
+     *   'allowed_vfolder_hosts': vfolder_hosts
+     * };
      */
-    constructor(client: any);
+    add(name: string, input: any): Promise<any>;
     /**
-     * Attach to the background task to listen to events
-     * @param {string} task_id - background task id.
+     * mutate specified resource policy with given name with new values.
+     *
+     * @param {string} name - resource policy name to mutate. (READ-ONLY)
+     * @param {json} input - resource policy specification and data. Required fields are:
+     * {
+     *   {string} 'default_for_unspecified': 'UNLIMITED', // default resource policy when resource slot is not given. 'UNLIMITED' or 'LIMITED'.
+     *   {JSONString} 'total_resource_slots': JSON.stringify(total_resource_slots), // Resource slot value. should be Stringified JSON.
+     *   {int} 'max_concurrent_sessions': concurrency_limit,
+     *   {int} 'max_containers_per_session': containers_per_session_limit,
+     *   {bigint} 'idle_timeout': idle_timeout,
+     *   {int} 'max_vfolder_count': vfolder_count_limit,
+     *   {bigint} 'max_vfolder_size': vfolder_capacity_limit,
+     *   {[string]} 'allowed_vfolder_hosts': vfolder_hosts
+     * };
      */
-    attach_background_task(task_id: string): EventSource;
+    mutate(name: string, input: any): Promise<any>;
     /**
-     * Rescan image from repository
-     * @param {string} registry - registry. default is ''
+     * delete specified resource policy that exists in policy list.
+     *
+     * @param {string} name - resource policy name to delete. (READ-ONLY)
      */
-    rescan_images(registry?: string): Promise<any>;
-    recalculate_usage(): Promise<any>;
+    delete(name?: string): Promise<any>;
 }
 declare class User {
-    client: any;
     /**
      * The user API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any);
+    constructor(client: Client);
+    client: Client;
     /**
      * List all registred users.
      *
@@ -1041,7 +924,7 @@ declare class User {
      *   'groups': List(UUID)  // Group Ids for user. Shoule be list of UUID strings.
      * };
      */
-    get(email: any, fields?: string[]): Promise<any>;
+    get(email: string, fields?: string[]): Promise<any>;
     /**
      * add new user with given information.
      *
@@ -1059,7 +942,7 @@ declare class User {
      *   'group_ids': List(UUID)  // Group Ids for user. Shoule be list of UUID strings.
      * };
      */
-    create(email: any, input: any): Promise<any>;
+    create(email: string, input: any): Promise<any>;
     /**
      * modify user information with given user id with new values.
      *
@@ -1077,22 +960,157 @@ declare class User {
      *   'group_ids': List(UUID)  // Group Ids for user. Shoule be list of UUID strings.
      * };
      */
-    update(email: any, input: any): Promise<any>;
+    update(email: string, input: any): Promise<any>;
     /**
      * delete user information with given user id
      *
      * @param {string} email - E-mail address as user id to delete.
      */
-    delete(email: any): Promise<any>;
+    delete(email: string): Promise<any>;
+}
+declare class Group {
+    /**
+     * The group API wrapper.
+     *
+     * @param {Client} client - the Client API wrapper object to bind
+     */
+    constructor(client: Client);
+    client: Client;
+    /**
+     * List registred groups.
+     * @param {boolean} is_active - List whether active users or inactive users.
+     * @param {string} domain_name - domain name of group
+     * {
+     *   'name': String,          // Group name.
+     *   'description': String,   // Description for group.
+     *   'is_active': Boolean,    // Whether the group is active or not.
+     *   'created_at': String,    // Created date of group.
+     *   'modified_at': String,   // Modified date of group.
+     *   'domain_name': String,   // Domain for group.
+     * };
+     */
+    list(is_active?: boolean, domain_name?: string, fields?: string[]): Promise<any>;
+}
+declare class Domain {
+    /**
+     * The domain API wrapper.
+     *
+     * @param {Client} client - the Client API wrapper object to bind
+     */
+    constructor(client: Client);
+    client: Client;
+    /**
+     * Get domain information.
+     * @param {string} domain_name - domain name of group
+     * @param {array} fields - fields to query.  Default fields are: ['name', 'description', 'is_active', 'created_at', 'modified_at', 'total_resource_slots', 'allowed_vfolder_hosts',
+     'allowed_docker_registries', 'integration_id', 'scaling_groups']
+     * {
+     *   'name': String,          // Group name.
+     *   'description': String,   // Description for group.
+     *   'is_active': Boolean,    // Whether the group is active or not.
+     *   'created_at': String,    // Created date of group.
+     *   'modified_at': String,   // Modified date of group.
+     *   'total_resource_slots': JSOONString,   // Total resource slots
+     *   'allowed_vfolder_hosts': [String],   // Allowed virtual folder hosts
+     *   'allowed_docker_registries': [String],   // Allowed docker registry lists
+     *   'integration_id': [String],   // Integration ids
+     *   'scaling_groups': [String],   // Scaling groups
+     * };
+     */
+    get(domain_name?: string, fields?: any[]): Promise<any>;
+    list(fields?: string[]): Promise<any>;
+    /**
+     * Modify domain information.
+     * @param {string} domain_name - domain name of group
+  
+  
+     * @param {json} input - Domain specification to change. Required fields are:
+     * {
+     *   'name': String,          // Group name.
+     *   'description': String,   // Description for group.
+     *   'is_active': Boolean,    // Whether the group is active or not.
+     *   'created_at': String,    // Created date of group.
+     *   'modified_at': String,   // Modified date of group.
+     *   'total_resource_slots': JSOONString,   // Total resource slots
+     *   'allowed_vfolder_hosts': [String],   // Allowed virtual folder hosts
+     *   'allowed_docker_registries': [String],   // Allowed docker registry lists
+     *   'integration_id': [String],   // Integration ids
+     *   'scaling_groups': [String],   // Scaling groups
+     * };
+     */
+    update(domain_name: string, input: any): Promise<any>;
+}
+declare class Resources {
+    constructor(client: any);
+    client: any;
+    resources: {};
+    _init_resource_values(): void;
+    agents: any;
+    /**
+     * Total resource information of Backend.AI cluster.
+     *
+     * @param {string} status - Resource node status to get information.
+     */
+    totalResourceInformation(status?: string): Promise<any>;
+    /**
+     * user statistics about usage.
+     *
+     */
+    user_stats(): Promise<any>;
+}
+declare class StorageProxy {
+    /**
+     * Agent API wrapper.
+     *
+     * @param {Client} client - the Client API wrapper object to bind
+     */
+    constructor(client: Client);
+    client: Client;
+    /**
+     * List storage proxies and its volumes.
+     *
+     * @param {array} fields - Fields to query. Queryable fields are:  'id', 'backend', 'capabilities'.
+     * @param {number} limit - limit number of query items.
+     * @param {number} offset - offset for item query. Useful for pagination.
+     */
+    list(fields?: any[], limit?: number, offset?: number): Promise<any>;
+    /**
+     * Detail of specific storage proxy / volume.
+     *
+     * @param {string} host - Virtual folder host.
+     * @param {array} fields - Fields to query. Queryable fields are:  'id', 'backend', 'capabilities'.
+     */
+    detail(host?: string, fields?: any[]): Promise<any>;
+}
+declare class Maintenance {
+    /**
+     * The Maintenance API wrapper.
+     *
+     * @param {Client} client - the Client API wrapper object to bind
+     */
+    constructor(client: Client);
+    client: Client;
+    urlPrefix: string;
+    /**
+     * Attach to the background task to listen to events
+     * @param {string} task_id - background task id.
+     */
+    attach_background_task(task_id: string): EventSource;
+    /**
+     * Rescan image from repository
+     * @param {string} registry - registry. default is ''
+     */
+    rescan_images(registry?: string): Promise<any>;
+    recalculate_usage(): Promise<any>;
 }
 declare class ScalingGroup {
-    client: any;
     /**
      * The Scaling Group API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any);
+    constructor(client: Client);
+    client: Client;
     list_available(): Promise<any>;
     list(group?: string): Promise<any>;
     /**
@@ -1101,7 +1119,7 @@ declare class ScalingGroup {
      *
      * @param {string} group - Scaling group name
      */
-    getWsproxyVersion(group: any): Promise<any>;
+    getWsproxyVersion(group: string): Promise<any>;
     /**
      * Create a scaling group
      *
@@ -1109,14 +1127,14 @@ declare class ScalingGroup {
      * @param {string} description - Scaling group description
      * @param {string} wsproxyAddress - wsproxy url (NEW in manager 21.09)
      */
-    create(name: any, description?: string, wsproxyAddress?: any): Promise<any>;
+    create(name: string, description?: string, wsproxyAddress?: string): Promise<any>;
     /**
      * Associate a scaling group with a domain
      *
      * @param {string} domain - domain name
      * @param {string} scaling_group - scaling group name
      */
-    associate_domain(domain: any, scaling_group: any): Promise<any>;
+    associate_domain(domain: string, scaling_group: string): Promise<any>;
     /**
      * Modify a scaling group
      *
@@ -1132,30 +1150,30 @@ declare class ScalingGroup {
      *   'wsproxy_addr': String         // NEW in manager 21.09
      * }
      */
-    update(name: any, input: any): Promise<any>;
+    update(name: string, input: any): Promise<any>;
     /**
      * Delete a scaling group
      *
      * @param {string} name - name of scaling group to be deleted
      */
-    delete(name: any): Promise<any>;
+    delete(name: string): Promise<any>;
 }
 declare class Registry {
-    client: any;
     constructor(client: any);
+    client: any;
     list(): Promise<any>;
     set(key: any, value: any): Promise<any>;
     delete(key: any): Promise<any>;
 }
 declare class Setting {
-    client: any;
-    config: any;
     /**
      * Setting API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
-    constructor(client: any);
+    constructor(client: Client);
+    client: Client;
+    config: any;
     /**
      * List settings
      *
@@ -1174,46 +1192,24 @@ declare class Setting {
      * @param {string} key - key to add.
      * @param {object} value - value to add.
      */
-    set(key: any, value: any): Promise<any>;
+    set(key: string, value: object): Promise<any>;
     /**
      * Delete a setting
      *
      * @param {string} key - key to delete
      * @param {boolean} prefix - prefix to delete. if prefix is true, this command will delete every settings starting with the key.
      */
-    delete(key: any, prefix?: boolean): Promise<any>;
-}
-declare class Service {
-    client: any;
-    config: any;
-    /**
-     * Service-specific API wrapper.
-     *
-     * @param {Client} client - the Client API wrapper object to bind
-     */
-    constructor(client: any);
-    /**
-     * Get announcements
-     *
-     */
-    get_announcement(): Promise<any>;
-    /**
-     * Update announcement
-     *
-     * @param {boolean} enabled - Enable / disable announcement. Default is True.
-     * @param {string} message - Announcement content. Usually in Markdown syntax.
-     */
-    update_announcement(enabled: boolean, message: any): Promise<any>;
+    delete(key: string, prefix?: boolean): Promise<any>;
 }
 declare class UserConfig {
-    client: any;
-    config: any;
     /**
      * Setting API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
     constructor(client: Client);
+    client: Client;
+    config: any;
     /**
      * Get content of bootstrap script of a keypair.
      */
@@ -1223,7 +1219,7 @@ declare class UserConfig {
      *
      * @param {string} data - text content of bootstrap script.
      */
-    update_bootstrap_script(script: string): Promise<any>;
+    update_bootstrap_script(script: any): Promise<any>;
     /**
      * Create content of script dotfile (.bashrc or .zshrc)
      * @param {string} data - text content of script dotfile
@@ -1248,30 +1244,52 @@ declare class UserConfig {
      */
     delete(path: string): Promise<any>;
 }
-declare class Enterprise {
-    client: any;
+declare class Service {
+    /**
+     * Service-specific API wrapper.
+     *
+     * @param {Client} client - the Client API wrapper object to bind
+     */
+    constructor(client: Client);
+    client: Client;
     config: any;
-    certificate: any;
+    /**
+     * Get announcements
+     *
+     */
+    get_announcement(): Promise<any>;
+    /**
+     * Update announcement
+     *
+     * @param {boolean} enabled - Enable / disable announcement. Default is True.
+     * @param {string} message - Announcement content. Usually in Markdown syntax.
+     */
+    update_announcement(enabled: boolean, message: string): Promise<any>;
+}
+declare class Enterprise {
     /**
      * Setting API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
     constructor(client: Client);
+    client: Client;
+    config: any;
     /**
      * Get the current enterprise license.
      */
     getLicense(): Promise<any>;
+    certificate: any;
 }
 declare class Cloud {
-    client: any;
-    config: any;
     /**
      * Setting API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
     constructor(client: Client);
+    client: Client;
+    config: any;
     /**
      * Check if cloud endpoint is available.
      */
@@ -1304,14 +1322,14 @@ declare class Cloud {
     change_password(email: string, password: string, token: string): Promise<any>;
 }
 declare class EduApp {
-    client: any;
-    config: any;
     /**
      * Setting API wrapper.
      *
      * @param {Client} client - the Client API wrapper object to bind
      */
     constructor(client: Client);
+    client: Client;
+    config: any;
     /**
      * Check if EduApp endpoint is available.
      */
@@ -1321,24 +1339,4 @@ declare class EduApp {
      */
     get_mount_folders(): Promise<any>;
 }
-declare class utils {
-    client: any;
-    constructor(client: any);
-    changeBinaryUnit(value: any, targetUnit?: string, defaultUnit?: string): any;
-    elapsedTime(start: any, end: any): string;
-    _padding_zeros(n: any, width: any): any;
-    /**
-     * Limit the boundary of value
-     *
-     * @param {number} value - input value to be clamped
-     * @param {number} min - minimum value of the input value
-     * @param {number} max - maximum value of the input vallue
-     */
-    clamp(value: number, min: number, max: number): number;
-    gqlToObject(array: any, key: any): {};
-    gqlToList(array: any, key: any): any[];
-}
-declare const backend: {
-    Client: typeof Client;
-    ClientConfig: typeof ClientConfig;
-};
+export { Client as BackendAIClient, ClientConfig as BackendAIClientConfig };
