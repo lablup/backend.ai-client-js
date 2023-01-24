@@ -6,7 +6,7 @@
   "scripts": {
     "test": "",
     "build-doc": "./node_modules/jsdoc/jsdoc.js -c ./jsdoc.json",
-    "declare": "npx -p typescript tsc backend.ai-client-node.js --declaration --allowJs --emitDeclarationOnly --outDir lib"
+    "declare": "npx -p typescript tsc backend.ai-client-node.ts --target es2017 --declaration --emitDeclarationOnly --outDir lib"
   },
   "repository": {
     "type": "git",
